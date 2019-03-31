@@ -21,8 +21,8 @@ class OVOEnergy():
                 sys.exit(1)
             else:
                 self.cookies = response.cookies
-        except requests.exceptions.RequestException as e:
-            print(e)
+        except requests.exceptions.RequestException as req_error:
+            print(req_error)
             sys.exit(1)
 
     def get_daily_usage(self, month):
@@ -44,8 +44,8 @@ class OVOEnergy():
                 gas = json_response['gas']
                 if 'data' in gas:
                     gas_usage = gas['data']
-        except requests.exceptions.RequestException as e:
-            print(e)
+        except requests.exceptions.RequestException as req_error:
+            print(req_error)
             sys.exit(1)
 
         return {'electricity': electricity_usage, 'gas': gas_usage}
@@ -69,8 +69,8 @@ class OVOEnergy():
                 gas = json_response['gas']
                 if 'data' in gas:
                     gas_usage = gas['data']
-        except requests.exceptions.RequestException as e:
-            print(e)
+        except requests.exceptions.RequestException as req_error:
+            print(req_error)
             sys.exit(1)
 
         return {'electricity': electricity_usage, 'gas': gas_usage}

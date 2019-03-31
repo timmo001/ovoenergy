@@ -1,6 +1,6 @@
 """Enable CLI."""
-import click
 import json
+import click
 
 
 @click.command()
