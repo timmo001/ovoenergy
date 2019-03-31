@@ -21,6 +21,13 @@ class OVOEnergy():
                 sys.exit(1)
             else:
                 self.cookies = response.cookies
+                response = requests.get(
+                    'https://smartpaym.ovoenergy.com/api/customer-and-' +
+                    'account-ids',
+                    cookies=self.cookies)
+                json_response = response.json()
+                if 'accountIds' in json_response:
+                    self.account_id = json_response['accountIds'][0]
         except requests.exceptions.RequestException as req_error:
             print(req_error)
             sys.exit(1)
@@ -33,7 +40,8 @@ class OVOEnergy():
         gas_usage = None
         try:
             response = requests.get(
-                'https://smartpaym.ovoenergy.com/api/energy-usage/daily/6129307?date=' + month,
+                'https://smartpaym.ovoenergy.com/api/energy-usage/daily/' +
+                self.account_id + '?date=' + month,
                 cookies=self.cookies)
             json_response = response.json()
             if 'electricity' in json_response:
@@ -58,7 +66,8 @@ class OVOEnergy():
         gas_usage = None
         try:
             response = requests.get(
-                'https://smartpaym.ovoenergy.com/api/energy-usage/half-hourly/6129307?date=' + date,
+                'https://smartpaym.ovoenergy.com/api/energy-usage/' +
+                'half-hourly/' + self.account_id + '?date=' + date,
                 cookies=self.cookies)
             json_response = response.json()
             if 'electricity' in json_response:
