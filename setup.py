@@ -13,7 +13,7 @@ setuptools.setup(
     long_description=LONG,
     long_description_content_type="text/markdown",
     install_requires=[
-        requests==2.21.0
+        'requests==2.21.0'
     ],
     entry_points={
         'console_scripts': [
