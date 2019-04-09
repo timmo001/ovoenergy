@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="ovoenergy",
-    version="0.1.2",
+    version="0.1.3",
     author="Timmo",
     author_email="contact@timmo.xyz",
     description="",
