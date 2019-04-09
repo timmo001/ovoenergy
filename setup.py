@@ -4,9 +4,6 @@ import setuptools
 with open("README.md", "r") as fh:
     LONG = fh.read()
 
-with open('requirements.txt') as f:
-    REQ = f.read().splitlines()
-
 setuptools.setup(
     name="ovoenergy",
     version="0.1.0",
@@ -15,7 +12,9 @@ setuptools.setup(
     description="",
     long_description=LONG,
     long_description_content_type="text/markdown",
-    install_requires=REQ,
+    install_requires=[
+        requests==2.21.0
+    ],
     entry_points={
         'console_scripts': [
             'ovoenergy = ovoenergy.cli:cli'
