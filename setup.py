@@ -6,13 +6,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="ovoenergy",
-    version="0.1.3",
+    version="0.2.0",
     author="Timmo",
     author_email="contact@timmo.xyz",
     description="",
     long_description=LONG,
     long_description_content_type="text/markdown",
     install_requires=[
+        'click==7.1.1'
         'requests==2.23.0'
     ],
     entry_points={
