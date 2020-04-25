@@ -12,6 +12,7 @@ import click
 def cli(username, password, date, daily=True, halfhour=False):
     """CLI for this package."""
     from ovoenergy.ovoenergy import OVOEnergy
+
     ovo = OVOEnergy(username, password)
     if daily is True:
         print(json.dumps(ovo.get_daily_usage(date)))
