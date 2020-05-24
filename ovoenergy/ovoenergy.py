@@ -174,3 +174,7 @@ class OVOEnergy:
                     )
 
         return OvoHalfHourUsage(electricity_usage, gas_usage)
+
+    @property
+    def account_id(self):
+        return self._account_id
