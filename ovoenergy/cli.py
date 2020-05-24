@@ -19,11 +19,11 @@ def cli(username, password, date, daily=True, halfhour=False):
 
 
 async def handle(username, password, date, daily=True, halfhour=False) -> None:
-    ovo = OVOEnergy()
-    if await ovo.authenticate(username, password) is True:
+    client = OVOEnergy()
+    if await client.authenticate(username, password) is True:
         print("Authenticated.")
         if daily is True:
-            usage = await ovo.get_daily_usage(date)
+            usage = await client.get_daily_usage(date)
             if usage is not None:
                 print("Usage:")
                 print(usage)
@@ -55,7 +55,7 @@ async def handle(username, password, date, daily=True, halfhour=False) -> None:
                         print(f"{count}.cost.amount: {x.cost.amount}")
                         print(f"{count}.cost.currency_unit: {x.cost.currency_unit}")
         if halfhour is True:
-            usage = await ovo.get_half_hourly_usage(date)
+            usage = await client.get_half_hourly_usage(date)
             if usage is not None:
                 print("Usage:")
                 print(usage)

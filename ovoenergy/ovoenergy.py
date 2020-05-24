@@ -2,7 +2,7 @@
 import asyncio
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import aiohttp
 
@@ -179,15 +179,17 @@ class OVOEnergy:
         return OVOHalfHourUsage(electricity_usage, gas_usage)
 
     async def get_last_reading(self, date: datetime = None) -> OVOHalfHourUsage:
-        date = date if date is None else datetime.utcnow()
+        date = date if date is not None else datetime.utcnow()
+        print(f"DATE: {date}")
         usage: OVOHalfHourUsage = await self.get_half_hourly_usage(
             date.strftime("%Y-%m-%d")
         )
-        return (
-            usage
-            if usage is not None and usage.electricity is not None
-            else self.get_last_reading(date)
-        )
+        if usage is None or usage.electricity is None or len(usage.electricity) == 0:
+            date = date - timedelta(days=1)
+            if date is datetime.utcnow() - timedelta(days=7):
+                return None
+            return await self.get_last_reading(date)
+        return usage
 
     @property
     def account_id(self):
