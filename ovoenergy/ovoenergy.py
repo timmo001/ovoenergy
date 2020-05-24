@@ -21,18 +21,6 @@ from ovoenergy import (
 class OVOEnergy:
     """Class for OVOEnergy."""
 
-    # async def get_session(self) -> aiohttp.ClientSession:
-    #     async with aiohttp.ClientSession() as session:
-    #         return session
-
-    # async def fetch(
-    #     self, session: aiohttp.ClientSession, url: str, json={}, cookies={}
-    # ) -> aiohttp.ClientResponse:
-    #     async with session.get(
-    #         url, allow_redirects=True, json=json, cookies=cookies
-    #     ) as response:
-    #         return await response
-
     def __init__(self) -> None:
         """Initilalize."""
         self._session = None
