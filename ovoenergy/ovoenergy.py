@@ -23,38 +23,35 @@ class OVOEnergy:
 
     def __init__(self) -> None:
         """Initilalize."""
-        self._session = None
         self._cookies = None
         self._account_id = None
         self._customer_id = None
 
     async def authenticate(self, username, password) -> bool:
         """Authenticate."""
-        self._session = aiohttp.ClientSession()
-
-        response = await self._session.post(
-            "https://my.ovoenergy.com/api/v2/auth/login",
-            json={"username": username, "password": password, "rememberMe": True},
-        )
-        response.raise_for_status()
-        if response.status is not 200:
-            return False
-
-        json_response = await response.json()
-
-        if "code" in json_response and json_response["code"] == "Unknown":
-            return False
-        else:
-            self._cookies = response.cookies
-            response = await self._session.get(
-                "https://smartpaym.ovoenergy.com/api/customer-and-account-ids",
-                cookies=self._cookies,
+        async with aiohttp.ClientSession() as session:
+            response = await session.post(
+                "https://my.ovoenergy.com/api/v2/auth/login",
+                json={"username": username, "password": password, "rememberMe": True},
             )
+            response.raise_for_status()
+            if response.status is not 200:
+                return False
             json_response = await response.json()
-            if "accountIds" in json_response:
-                self._account_id = json_response["accountIds"][0]
-            if "customerId" in json_response:
-                self._customer_id = json_response["customerId"]
+
+            if "code" in json_response and json_response["code"] == "Unknown":
+                return False
+            else:
+                self._cookies = response.cookies
+                response = await session.get(
+                    "https://smartpaym.ovoenergy.com/api/customer-and-account-ids",
+                    cookies=self._cookies,
+                )
+                json_response = await response.json()
+                if "accountIds" in json_response:
+                    self._account_id = json_response["accountIds"][0]
+                if "customerId" in json_response:
+                    self._customer_id = json_response["customerId"]
         return True
 
     async def get_daily_usage(self, month: str) -> OVODailyUsage:
@@ -64,14 +61,13 @@ class OVOEnergy:
         electricity_usage = None
         gas_usage = None
 
-        self._session = aiohttp.ClientSession()
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(
+                f"https://smartpaym.ovoenergy.com/api/energy-usage/daily/{self._account_id}?date={month}",
+                cookies=self._cookies,
+            )
+            json_response = await response.json()
 
-        response = await self._session.get(
-            f"https://smartpaym.ovoenergy.com/api/energy-usage/daily/{self._account_id}?date={month}",
-            cookies=self._cookies,
-        )
-        json_response = await response.json()
-        await self._session.close()
         if "electricity" in json_response:
             electricity = json_response["electricity"]
             if "data" in electricity:
@@ -136,14 +132,13 @@ class OVOEnergy:
         electricity_usage = None
         gas_usage = None
 
-        self._session = aiohttp.ClientSession()
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(
+                f"https://smartpaym.ovoenergy.com/api/energy-usage/half-hourly/{self._account_id}?date={date}",
+                cookies=self._cookies,
+            )
+            json_response = await response.json()
 
-        response = await self._session.get(
-            f"https://smartpaym.ovoenergy.com/api/energy-usage/half-hourly/{self._account_id}?date={date}",
-            cookies=self._cookies,
-        )
-        json_response = await response.json()
-        await self._session.close()
         if "electricity" in json_response:
             electricity = json_response["electricity"]
             if "data" in electricity:
