@@ -1,6 +1,10 @@
 """Enable CLI."""
+import asyncio
 import json
+
 import click
+
+from ovoenergy.ovoenergy import OVOEnergy
 
 
 @click.command()
@@ -11,13 +15,68 @@ import click
 @click.option("--halfhour", "-h", is_flag=True, help="Half hourly usage")
 def cli(username, password, date, daily=True, halfhour=False):
     """CLI for this package."""
-    from ovoenergy.ovoenergy import OVOEnergy
+    asyncio.run(handle(username, password, date, daily, halfhour))
 
-    ovo = OVOEnergy(username, password)
-    if daily is True:
-        print(json.dumps(ovo.get_daily_usage(date)))
-    if halfhour is True:
-        print(json.dumps(ovo.get_half_hourly_usage(date)))
+
+async def handle(username, password, date, daily=True, halfhour=False) -> None:
+    ovo = OVOEnergy()
+    if await ovo.authenticate(username, password) is True:
+        print("Authenticated.")
+        if daily is True:
+            usage = await ovo.get_daily_usage(date)
+            if usage is not None:
+                print("Usage:")
+                print(usage)
+                if usage.electricity is not None:
+                    print("Electricity:")
+                    count = 0
+                    for x in usage.electricity:
+                        count += 1
+                        print(f"{count}.consumption: {x.consumption}")
+                        print(f"{count}.interval.start: {x.interval.start}")
+                        print(f"{count}.interval.end: {x.interval.end}")
+                        print(f"{count}.meter_readings.start: {x.meter_readings.start}")
+                        print(f"{count}.meter_readings.end: {x.meter_readings.end}")
+                        print(f"{count}.has_hh_data: {x.has_half_hour_data}")
+                        print(f"{count}.cost.amount: {x.cost.amount}")
+                        print(f"{count}.cost.currency_unit: {x.cost.currency_unit}")
+                if usage.gas is not None:
+                    print("Gas:")
+                    count = 0
+                    for x in usage.gas:
+                        count += 1
+                        print(f"{count}.consumption: {x.consumption}")
+                        print(f"{count}.volume: {x.volume}")
+                        print(f"{count}.interval.start: {x.interval.start}")
+                        print(f"{count}.interval.end: {x.interval.end}")
+                        print(f"{count}.meter_readings.start: {x.meter_readings.start}")
+                        print(f"{count}.meter_readings.end: {x.meter_readings.end}")
+                        print(f"{count}.has_hh_data: {x.has_half_hour_data}")
+                        print(f"{count}.cost.amount: {x.cost.amount}")
+                        print(f"{count}.cost.currency_unit: {x.cost.currency_unit}")
+        if halfhour is True:
+            usage = await ovo.get_half_hourly_usage(date)
+            if usage is not None:
+                print("Usage:")
+                print(usage)
+                if usage.electricity is not None:
+                    print("Electricity:")
+                    count = 0
+                    for x in usage.electricity:
+                        count += 1
+                        print(f"consumption: {x.consumption}")
+                        print(f"{count}.interval.start: {x.interval.start}")
+                        print(f"{count}.interval.end: {x.interval.end}")
+                        print(f"{count}.unit: {x.unit}")
+                if usage.gas is not None:
+                    print("Gas:")
+                    count = 0
+                    for x in usage.gas:
+                        count += 1
+                        print(f"{count}.consumption: {x.consumption}")
+                        print(f"{count}.interval.start: {x.interval.start}")
+                        print(f"{count}.interval.end: {x.interval.end}")
+                        print(f"{count}.unit: {x.unit}")
 
 
 cli()  # pylint: disable=E1120

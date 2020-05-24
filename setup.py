@@ -13,8 +13,8 @@ setuptools.setup(
     long_description=LONG,
     long_description_content_type="text/markdown",
     install_requires=[
+        'aiohttp==3.6.2',
         'click==7.1.1'
-        'requests==2.23.0'
     ],
     entry_points={
         'console_scripts': [
