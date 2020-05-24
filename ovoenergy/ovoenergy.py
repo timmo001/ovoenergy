@@ -7,14 +7,14 @@ from datetime import datetime
 import aiohttp
 
 from ovoenergy import (
-    OvoCost,
-    OvoDailyElectricity,
-    OvoDailyGas,
-    OvoDailyUsage,
-    OvoHalfHour,
-    OvoHalfHourUsage,
-    OvoInterval,
-    OvoMeterReadings,
+    OVOCost,
+    OVODailyElectricity,
+    OVODailyGas,
+    OVODailyUsage,
+    OVOHalfHour,
+    OVOHalfHourUsage,
+    OVOInterval,
+    OVOMeterReadings,
 )
 
 
@@ -58,7 +58,7 @@ class OVOEnergy:
                 self._customer_id = json_response["customerId"]
         return True
 
-    async def get_daily_usage(self, month) -> OvoDailyUsage:
+    async def get_daily_usage(self, month) -> OVODailyUsage:
         """Get daily usage data."""
         if month is None:
             return None
@@ -75,9 +75,9 @@ class OVOEnergy:
                 electricity_usage = []
                 for usage in electricity["data"]:
                     electricity_usage.append(
-                        OvoDailyElectricity(
+                        OVODailyElectricity(
                             usage["consumption"],
-                            OvoInterval(
+                            OVOInterval(
                                 datetime.strptime(
                                     usage["interval"]["start"], "%Y-%m-%dT%H:%M:%S.%f"
                                 ),
@@ -85,12 +85,12 @@ class OVOEnergy:
                                     usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
                                 ),
                             ),
-                            OvoMeterReadings(
+                            OVOMeterReadings(
                                 usage["meterReadings"]["start"],
                                 usage["meterReadings"]["end"],
                             ),
                             usage["hasHhData"],
-                            OvoCost(
+                            OVOCost(
                                 usage["cost"]["amount"], usage["cost"]["currencyUnit"],
                             ),
                         )
@@ -102,10 +102,10 @@ class OVOEnergy:
                 gas_usage = []
                 for usage in gas["data"]:
                     gas_usage.append(
-                        OvoDailyGas(
+                        OVODailyGas(
                             usage["consumption"],
                             usage["volume"],
-                            OvoInterval(
+                            OVOInterval(
                                 datetime.strptime(
                                     usage["interval"]["start"], "%Y-%m-%dT%H:%M:%S.%f"
                                 ),
@@ -113,20 +113,20 @@ class OVOEnergy:
                                     usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
                                 ),
                             ),
-                            OvoMeterReadings(
+                            OVOMeterReadings(
                                 usage["meterReadings"]["start"],
                                 usage["meterReadings"]["end"],
                             ),
                             usage["hasHhData"],
-                            OvoCost(
+                            OVOCost(
                                 usage["cost"]["amount"], usage["cost"]["currencyUnit"],
                             ),
                         )
                     )
 
-        return OvoDailyUsage(electricity_usage, gas_usage)
+        return OVODailyUsage(electricity_usage, gas_usage)
 
-    async def get_half_hourly_usage(self, date) -> OvoHalfHourUsage:
+    async def get_half_hourly_usage(self, date) -> OVOHalfHourUsage:
         """Get half hourly usage data."""
         if date is None:
             return None
@@ -143,9 +143,9 @@ class OVOEnergy:
                 electricity_usage = []
                 for usage in electricity["data"]:
                     electricity_usage.append(
-                        OvoHalfHour(
+                        OVOHalfHour(
                             usage["consumption"],
-                            OvoInterval(
+                            OVOInterval(
                                 datetime.strptime(
                                     usage["interval"]["start"], "%Y-%m-%dT%H:%M:%S.%f"
                                 ),
@@ -162,9 +162,9 @@ class OVOEnergy:
                 gas_usage = []
                 for usage in gas["data"]:
                     gas_usage.append(
-                        OvoHalfHour(
+                        OVOHalfHour(
                             usage["consumption"],
-                            OvoInterval(
+                            OVOInterval(
                                 datetime.strptime(
                                     usage["interval"]["start"], "%Y-%m-%dT%H:%M:%S.%f"
                                 ),
@@ -176,7 +176,7 @@ class OVOEnergy:
                         )
                     )
 
-        return OvoHalfHourUsage(electricity_usage, gas_usage)
+        return OVOHalfHourUsage(electricity_usage, gas_usage)
 
     @property
     def account_id(self):

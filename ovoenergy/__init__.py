@@ -3,32 +3,32 @@ from datetime import datetime
 from typing import List
 
 
-class OvoInterval:
+class OVOInterval:
     def __init__(self, start: datetime, end: datetime):
         self.start = start
         self.end = end
 
 
-class OvoMeterReadings:
+class OVOMeterReadings:
     def __init__(self, start: float, end: float):
         self.start = start
         self.end = end
 
 
-class OvoCost:
+class OVOCost:
     def __init__(self, amount: float, currency_unit: str):
         self.amount = amount
         self.currency_unit = currency_unit
 
 
-class OvoDailyElectricity:
+class OVODailyElectricity:
     def __init__(
         self,
         consumption: float,
-        interval: OvoInterval,
-        meter_readings: OvoMeterReadings,
+        interval: OVOInterval,
+        meter_readings: OVOMeterReadings,
         has_half_hour_data: bool,
-        cost: OvoCost,
+        cost: OVOCost,
     ):
         self.consumption = consumption
         self.interval = interval
@@ -37,15 +37,15 @@ class OvoDailyElectricity:
         self.cost = cost
 
 
-class OvoDailyGas:
+class OVODailyGas:
     def __init__(
         self,
         consumption: float,
         volume: float,
-        interval: OvoInterval,
-        meter_readings: OvoMeterReadings,
+        interval: OVOInterval,
+        meter_readings: OVOMeterReadings,
         has_half_hour_data: bool,
-        cost: OvoCost,
+        cost: OVOCost,
     ):
         self.consumption = consumption
         self.volume = volume
@@ -55,20 +55,20 @@ class OvoDailyGas:
         self.cost = cost
 
 
-class OvoHalfHour:
-    def __init__(self, consumption: float, interval: OvoInterval, unit: str):
+class OVOHalfHour:
+    def __init__(self, consumption: float, interval: OVOInterval, unit: str):
         self.consumption = consumption
         self.interval = interval
         self.unit = unit
 
 
-class OvoDailyUsage:
-    def __init__(self, electricity: List[OvoDailyElectricity], gas: List[OvoDailyGas]):
+class OVODailyUsage:
+    def __init__(self, electricity: List[OVODailyElectricity], gas: List[OVODailyGas]):
         self.electricity = electricity
         self.gas = gas
 
 
-class OvoHalfHourUsage:
-    def __init__(self, electricity: List[OvoHalfHour], gas: List[OvoHalfHour]):
+class OVOHalfHourUsage:
+    def __init__(self, electricity: List[OVOHalfHour], gas: List[OVOHalfHour]):
         self.electricity = electricity
         self.gas = gas
