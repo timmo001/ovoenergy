@@ -9,7 +9,7 @@ setuptools.setup(
     version="0.2.0",
     author="Timmo",
     author_email="contact@timmo.xyz",
-    description="",
+    description="Get energy data from OVO's API",
     long_description=LONG,
     long_description_content_type="text/markdown",
     install_requires=[
