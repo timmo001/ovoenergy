@@ -58,7 +58,7 @@ class OVOEnergy:
                 self._customer_id = json_response["customerId"]
         return True
 
-    async def get_daily_usage(self, month) -> OVODailyUsage:
+    async def get_daily_usage(self, month: str) -> OVODailyUsage:
         """Get daily usage data."""
         if month is None:
             return None
@@ -126,7 +126,7 @@ class OVOEnergy:
 
         return OVODailyUsage(electricity_usage, gas_usage)
 
-    async def get_half_hourly_usage(self, date) -> OVOHalfHourUsage:
+    async def get_half_hourly_usage(self, date: str) -> OVOHalfHourUsage:
         """Get half hourly usage data."""
         if date is None:
             return None
