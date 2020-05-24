@@ -7,31 +7,31 @@ stages:
 jobs:
   include:
     #Linting
-    - stage: linting
-      install: pip install pycodestyle
-      name: "Linting with pycodestyle"
-      python: "3.7"
-      script: find . -name \*.py -exec pycodestyle {} +
-    - stage: linting
-      install: pip install pydocstyle
-      name: "Linting with pydocstyle"
-      python: "3.7"
-      script: find . -name \*.py -exec pydocstyle {} +
-    - stage: linting
-      install: pip install pylint
-      name: "Linting with pylint"
-      python: "3.7"
-      script: find . -name \*.py -exec pylint --disable=F0401,W0613,R0205,R0902,R0913,R0914,R1702,R0912,R0201,R0915 {} +
-    - stage: linting
-      install: pip install pyflakes
-      name: "Linting with pyflakes"
-      python: "3.7"
-      script: find . -name \*.py -exec pyflakes {} +
-    - stage: linting
-      install: pip install flake8
-      name: "Linting with flake8"
-      python: "3.7"
-      script: find . -name \*.py -exec flake8 {} +
+    # - stage: linting
+    #   install: pip install pycodestyle
+    #   name: "Linting with pycodestyle"
+    #   python: "3.7"
+    #   script: find . -name \*.py -exec pycodestyle {} +
+    # - stage: linting
+    #   install: pip install pydocstyle
+    #   name: "Linting with pydocstyle"
+    #   python: "3.7"
+    #   script: find . -name \*.py -exec pydocstyle {} +
+    # - stage: linting
+    #   install: pip install pylint
+    #   name: "Linting with pylint"
+    #   python: "3.7"
+    #   script: find . -name \*.py -exec pylint --disable=F0401,W0613,R0205,R0902,R0913,R0914,R1702,R0912,R0201,R0915 {} +
+    # - stage: linting
+    #   install: pip install pyflakes
+    #   name: "Linting with pyflakes"
+    #   python: "3.7"
+    #   script: find . -name \*.py -exec pyflakes {} +
+    # - stage: linting
+    #   install: pip install flake8
+    #   name: "Linting with flake8"
+    #   python: "3.7"
+    #   script: find . -name \*.py -exec flake8 {} +
 
     # Test install the module
     - stage: install
