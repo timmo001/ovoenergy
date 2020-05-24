@@ -69,6 +69,7 @@ class OVOEnergy:
             cookies=self._cookies,
         )
         json_response = await response.json()
+        await self._session.close()
         if "electricity" in json_response:
             electricity = json_response["electricity"]
             if "data" in electricity:
@@ -137,6 +138,7 @@ class OVOEnergy:
             cookies=self._cookies,
         )
         json_response = await response.json()
+        await self._session.close()
         if "electricity" in json_response:
             electricity = json_response["electricity"]
             if "data" in electricity:
