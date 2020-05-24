@@ -14,7 +14,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     install_requires=[
         'aiohttp==3.6.2',
-        'click==7.1.1'
+        'click==7.1.2'
     ],
     entry_points={
         'console_scripts': [
