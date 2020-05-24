@@ -30,8 +30,7 @@ class OVOEnergy:
 
     async def authenticate(self, username, password) -> bool:
         """Authenticate."""
-        if self._session is None:
-            self._session = aiohttp.ClientSession()
+        self._session = aiohttp.ClientSession()
 
         response = await self._session.post(
             "https://my.ovoenergy.com/api/v2/auth/login",
@@ -64,6 +63,9 @@ class OVOEnergy:
             return None
         electricity_usage = None
         gas_usage = None
+
+        self._session = aiohttp.ClientSession()
+
         response = await self._session.get(
             f"https://smartpaym.ovoenergy.com/api/energy-usage/daily/{self._account_id}?date={month}",
             cookies=self._cookies,
@@ -133,6 +135,9 @@ class OVOEnergy:
             return None
         electricity_usage = None
         gas_usage = None
+
+        self._session = aiohttp.ClientSession()
+
         response = await self._session.get(
             f"https://smartpaym.ovoenergy.com/api/energy-usage/half-hourly/{self._account_id}?date={date}",
             cookies=self._cookies,
