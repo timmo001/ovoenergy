@@ -178,6 +178,17 @@ class OVOEnergy:
 
         return OVOHalfHourUsage(electricity_usage, gas_usage)
 
+    async def get_last_reading(self, date: datetime = None) -> OVOHalfHourUsage:
+        date = date if date is None else datetime.utcnow()
+        usage: OVOHalfHourUsage = await self.get_half_hourly_usage(
+            date.strftime("%Y-%m-%d")
+        )
+        return (
+            usage
+            if usage is not None and usage.electricity is not None
+            else self.get_last_reading(date)
+        )
+
     @property
     def account_id(self):
         return self._account_id
