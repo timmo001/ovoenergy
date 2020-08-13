@@ -97,7 +97,7 @@ class OVOEnergy:
 
         if "gas" in json_response:
             gas = json_response["gas"]
-            if "data" in gas:
+            if gas and "data" in gas:
                 gas_usage = []
                 for usage in gas["data"]:
                     gas_usage.append(
