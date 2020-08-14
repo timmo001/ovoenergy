@@ -23,9 +23,10 @@ class OVOEnergy:
 
     def __init__(self) -> None:
         """Initilalize."""
-        self._cookies = None
         self._account_id = None
+        self._cookies = None
         self._customer_id = None
+        self._username = None
 
     async def authenticate(self, username, password) -> bool:
         """Authenticate."""
@@ -52,6 +53,7 @@ class OVOEnergy:
                     self._account_id = json_response["accountIds"][0]
                 if "customerId" in json_response:
                     self._customer_id = json_response["customerId"]
+                self._username = username
         return True
 
     async def get_daily_usage(self, month: str) -> OVODailyUsage:
@@ -200,3 +202,7 @@ class OVOEnergy:
     @property
     def customer_id(self):
         return self._customer_id
+
+    @property
+    def username(self):
+        return self._username
