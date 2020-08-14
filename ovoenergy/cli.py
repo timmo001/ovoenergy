@@ -20,7 +20,9 @@ def cli(username, password, date, daily=True, halfhour=False):
 
 async def handle(username, password, date, daily=True, halfhour=False) -> None:
     client = OVOEnergy()
-    if await client.authenticate(username, password) is True:
+    authenticated = await client.authenticate(username, password)
+    print(f"Authenticated: {authenticated}")
+    if authenticated:
         print("Authenticated.")
         if daily is True:
             usage = await client.get_daily_usage(date)
