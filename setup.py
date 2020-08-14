@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="ovoenergy",
-    version="1.1.7",
+    version="1.1.8",
     author="Timmo",
     author_email="contact@timmo.xyz",
     description="Get energy data from OVO's API",
