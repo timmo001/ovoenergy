@@ -33,7 +33,11 @@ class OVOEnergy:
         async with aiohttp.ClientSession() as session:
             response = await session.post(
                 "https://my.ovoenergy.com/api/v2/auth/login",
-                json={"username": username, "password": password, "rememberMe": True,},
+                json={
+                    "username": username,
+                    "password": password,
+                    "rememberMe": True,
+                },
             )
 
             try:
@@ -98,7 +102,8 @@ class OVOEnergy:
                             ),
                             usage["hasHhData"],
                             OVOCost(
-                                usage["cost"]["amount"], usage["cost"]["currencyUnit"],
+                                usage["cost"]["amount"],
+                                usage["cost"]["currencyUnit"],
                             ),
                         )
                     )
@@ -126,7 +131,8 @@ class OVOEnergy:
                             ),
                             usage["hasHhData"],
                             OVOCost(
-                                usage["cost"]["amount"], usage["cost"]["currencyUnit"],
+                                usage["cost"]["amount"],
+                                usage["cost"]["currencyUnit"],
                             ),
                         )
                     )
