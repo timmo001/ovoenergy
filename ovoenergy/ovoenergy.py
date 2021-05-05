@@ -1,7 +1,4 @@
 """Get energy data from OVO's API."""
-import asyncio
-import json
-import sys
 from datetime import datetime, timedelta
 
 import aiohttp
@@ -45,7 +42,7 @@ class OVOEnergy:
             except:
                 pass
 
-            if response.status is not 200:
+            if response.status != 200:
                 return False
             json_response = await response.json()
 
@@ -85,26 +82,48 @@ class OVOEnergy:
             if electricity and "data" in electricity:
                 electricity_usage = []
                 for usage in electricity["data"]:
+
+                    if "consumption" in usage:
+                        consumption = usage["consumption"]
+                    else:
+                        consumption = None
+                    if "interval" in usage:
+                        interval = OVOInterval(
+                            datetime.strptime(
+                                usage["interval"]["start"], "%Y-%m-%dT%H:%M:%S.%f"
+                            ),
+                            datetime.strptime(
+                                usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
+                            ),
+                        )
+                    else:
+                        interval = None
+                    if "meterReadings" in usage:
+                        meterReadings = OVOMeterReadings(
+                            usage["meterReadings"]["start"],
+                            usage["meterReadings"]["end"],
+                        )
+                    else:
+                        meterReadings = None
+                    if "hasHhData" in usage:
+                        hashHhData = usage["hasHhData"]
+                    else:
+                        hashHhData = None
+                    if "cost" in usage:
+                        cost = OVOCost(
+                            usage["cost"]["amount"],
+                            usage["cost"]["currencyUnit"],
+                        )
+                    else:
+                        cost = None
+
                     electricity_usage.append(
                         OVODailyElectricity(
-                            usage["consumption"],
-                            OVOInterval(
-                                datetime.strptime(
-                                    usage["interval"]["start"], "%Y-%m-%dT%H:%M:%S.%f"
-                                ),
-                                datetime.strptime(
-                                    usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
-                                ),
-                            ),
-                            OVOMeterReadings(
-                                usage["meterReadings"]["start"],
-                                usage["meterReadings"]["end"],
-                            ),
-                            usage["hasHhData"],
-                            OVOCost(
-                                usage["cost"]["amount"],
-                                usage["cost"]["currencyUnit"],
-                            ),
+                            consumption,
+                            interval,
+                            meterReadings,
+                            hashHhData,
+                            cost,
                         )
                     )
 
