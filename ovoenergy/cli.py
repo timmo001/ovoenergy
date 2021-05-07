@@ -1,6 +1,5 @@
 """Enable CLI."""
 import asyncio
-import json
 
 import click
 
@@ -37,8 +36,8 @@ async def handle(username, password, date, daily=True, halfhour=False) -> None:
                         print(f"{count}.consumption: {x.consumption}")
                         print(f"{count}.interval.start: {x.interval.start}")
                         print(f"{count}.interval.end: {x.interval.end}")
-                        print(f"{count}.meter_readings.start: {x.meter_readings.start}")
-                        print(f"{count}.meter_readings.end: {x.meter_readings.end}")
+                        # print(f"{count}.meter_readings.start: {x.meter_readings.start}")
+                        # print(f"{count}.meter_readings.end: {x.meter_readings.end}")
                         print(f"{count}.has_hh_data: {x.has_half_hour_data}")
                         print(f"{count}.cost.amount: {x.cost.amount}")
                         print(f"{count}.cost.currency_unit: {x.cost.currency_unit}")
@@ -51,8 +50,8 @@ async def handle(username, password, date, daily=True, halfhour=False) -> None:
                         print(f"{count}.volume: {x.volume}")
                         print(f"{count}.interval.start: {x.interval.start}")
                         print(f"{count}.interval.end: {x.interval.end}")
-                        print(f"{count}.meter_readings.start: {x.meter_readings.start}")
-                        print(f"{count}.meter_readings.end: {x.meter_readings.end}")
+                        # print(f"{count}.meter_readings.start: {x.meter_readings.start}")
+                        # print(f"{count}.meter_readings.end: {x.meter_readings.end}")
                         print(f"{count}.has_hh_data: {x.has_half_hour_data}")
                         print(f"{count}.cost.amount: {x.cost.amount}")
                         print(f"{count}.cost.currency_unit: {x.cost.currency_unit}")
