@@ -41,9 +41,11 @@ class OVOEnergy:
                 response.raise_for_status()
             except:
                 pass
+
             if response.status is not 200:
                 return False
             json_response = await response.json()
+
             if "code" in json_response and json_response["code"] == "Unknown":
                 return False
             else:
