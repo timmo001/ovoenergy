@@ -42,7 +42,7 @@ class OVOEnergy:
             except:
                 pass
 
-            if response.status != 200:
+            if response.status is not 200:
                 return False
             json_response = await response.json()
 

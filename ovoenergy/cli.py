@@ -1,6 +1,5 @@
 """Enable CLI."""
 import asyncio
-import json
 
 import click
 
