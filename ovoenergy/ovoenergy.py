@@ -82,79 +82,81 @@ class OVOEnergy:
             if electricity and "data" in electricity:
                 electricity_usage = []
                 for usage in electricity["data"]:
-
-                    if "consumption" in usage:
-                        consumption = usage["consumption"]
-                    else:
-                        consumption = None
-                    if "interval" in usage:
-                        interval = OVOInterval(
-                            datetime.strptime(
-                                usage["interval"]["start"], "%Y-%m-%dT%H:%M:%S.%f"
-                            ),
-                            datetime.strptime(
-                                usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
-                            ),
+                    if usage is not None:
+                        electricity_usage.append(
+                            OVODailyElectricity(
+                                usage["consumption"]
+                                if "consumption" in usage
+                                else None,
+                                OVOInterval(
+                                    datetime.strptime(
+                                        usage["interval"]["start"],
+                                        "%Y-%m-%dT%H:%M:%S.%f",
+                                    ),
+                                    datetime.strptime(
+                                        usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
+                                    ),
+                                )
+                                if "interval" in usage
+                                and "start" in usage["interval"]
+                                and "end" in usage["interval"]
+                                else None,
+                                OVOMeterReadings(
+                                    usage["meterReadings"]["start"],
+                                    usage["meterReadings"]["end"],
+                                )
+                                if "meterReadings" in usage
+                                else None,
+                                usage["hasHhData"] if "hasHhData" in usage else None,
+                                OVOCost(
+                                    usage["cost"]["amount"],
+                                    usage["cost"]["currencyUnit"],
+                                )
+                                if "cost" in usage
+                                else None,
+                            )
                         )
-                    else:
-                        interval = None
-                    if "meterReadings" in usage:
-                        meterReadings = OVOMeterReadings(
-                            usage["meterReadings"]["start"],
-                            usage["meterReadings"]["end"],
-                        )
-                    else:
-                        meterReadings = None
-                    if "hasHhData" in usage:
-                        hashHhData = usage["hasHhData"]
-                    else:
-                        hashHhData = None
-                    if "cost" in usage:
-                        cost = OVOCost(
-                            usage["cost"]["amount"],
-                            usage["cost"]["currencyUnit"],
-                        )
-                    else:
-                        cost = None
-
-                    electricity_usage.append(
-                        OVODailyElectricity(
-                            consumption,
-                            interval,
-                            meterReadings,
-                            hashHhData,
-                            cost,
-                        )
-                    )
 
         if "gas" in json_response:
             gas = json_response["gas"]
             if gas and "data" in gas:
                 gas_usage = []
                 for usage in gas["data"]:
-                    gas_usage.append(
-                        OVODailyGas(
-                            usage["consumption"],
-                            usage["volume"],
-                            OVOInterval(
-                                datetime.strptime(
-                                    usage["interval"]["start"], "%Y-%m-%dT%H:%M:%S.%f"
-                                ),
-                                datetime.strptime(
-                                    usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
-                                ),
-                            ),
-                            OVOMeterReadings(
-                                usage["meterReadings"]["start"],
-                                usage["meterReadings"]["end"],
-                            ),
-                            usage["hasHhData"],
-                            OVOCost(
-                                usage["cost"]["amount"],
-                                usage["cost"]["currencyUnit"],
-                            ),
+                    if usage is not None:
+                        gas_usage.append(
+                            OVODailyGas(
+                                usage["consumption"]
+                                if "consumption" in usage
+                                else None,
+                                usage["volume"] if "volume" in usage else None,
+                                OVOInterval(
+                                    datetime.strptime(
+                                        usage["interval"]["start"],
+                                        "%Y-%m-%dT%H:%M:%S.%f",
+                                    ),
+                                    datetime.strptime(
+                                        usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
+                                    ),
+                                )
+                                if "interval" in usage
+                                and "start" in usage["interval"]
+                                and "end" in usage["interval"]
+                                else None,
+                                OVOMeterReadings(
+                                    usage["meterReadings"]["start"],
+                                    usage["meterReadings"]["end"],
+                                )
+                                if "meterReadings" in usage
+                                else None,
+                                usage["hasHhData"] if "hasHhData" in usage else None,
+                                OVOCost(
+                                    usage["cost"]["amount"],
+                                    usage["cost"]["currencyUnit"],
+                                )
+                                if "cost" in usage
+                                else None,
+                            )
                         )
-                    )
 
         return OVODailyUsage(electricity_usage, gas_usage)
 
@@ -177,39 +179,55 @@ class OVOEnergy:
             if electricity and "data" in electricity:
                 electricity_usage = []
                 for usage in electricity["data"]:
-                    electricity_usage.append(
-                        OVOHalfHour(
-                            usage["consumption"],
-                            OVOInterval(
-                                datetime.strptime(
-                                    usage["interval"]["start"], "%Y-%m-%dT%H:%M:%S.%f"
-                                ),
-                                datetime.strptime(
-                                    usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
-                                ),
-                            ),
-                            usage["unit"],
+                    if usage is not None:
+                        electricity_usage.append(
+                            OVOHalfHour(
+                                usage["consumption"]
+                                if "consumption" in usage
+                                else None,
+                                OVOInterval(
+                                    datetime.strptime(
+                                        usage["interval"]["start"],
+                                        "%Y-%m-%dT%H:%M:%S.%f",
+                                    ),
+                                    datetime.strptime(
+                                        usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
+                                    ),
+                                )
+                                if "interval" in usage
+                                and "start" in usage["interval"]
+                                and "end" in usage["interval"]
+                                else None,
+                                usage["unit"] if "unit" in usage else None,
+                            )
                         )
-                    )
         if "gas" in json_response:
             gas = json_response["gas"]
             if gas and "data" in gas:
                 gas_usage = []
                 for usage in gas["data"]:
-                    gas_usage.append(
-                        OVOHalfHour(
-                            usage["consumption"],
-                            OVOInterval(
-                                datetime.strptime(
-                                    usage["interval"]["start"], "%Y-%m-%dT%H:%M:%S.%f"
-                                ),
-                                datetime.strptime(
-                                    usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
-                                ),
-                            ),
-                            usage["unit"],
+                    if usage is not None:
+                        gas_usage.append(
+                            OVOHalfHour(
+                                usage["consumption"]
+                                if "consumption" in usage
+                                else None,
+                                OVOInterval(
+                                    datetime.strptime(
+                                        usage["interval"]["start"],
+                                        "%Y-%m-%dT%H:%M:%S.%f",
+                                    ),
+                                    datetime.strptime(
+                                        usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
+                                    ),
+                                )
+                                if "interval" in usage
+                                and "start" in usage["interval"]
+                                and "end" in usage["interval"]
+                                else None,
+                                usage["unit"] if "unit" in usage else None,
+                            )
                         )
-                    )
 
         return OVOHalfHourUsage(electricity_usage, gas_usage)
 
