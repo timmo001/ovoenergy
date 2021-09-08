@@ -81,7 +81,7 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v2.3.4
       - name: 🚀 Run Prettier
-        uses: creyD/prettier_action@v3.3
+        uses: creyD/prettier_action@v4.0
         with:
           prettier_options: --write **/*.{js,json,ts,tsx,yml,yaml}
         env:
