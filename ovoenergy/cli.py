@@ -9,17 +9,18 @@ from ovoenergy.ovoenergy import OVOEnergy
 @click.command()
 @click.option("--username", "-u", help="Username")
 @click.option("--password", "-p", help="Password")
+@click.option("--account", "-a", help="Account Number")
 @click.option("--date", "-D", help="Date")
 @click.option("--daily", "-d", is_flag=True, help="Daily usage")
 @click.option("--halfhour", "-h", is_flag=True, help="Half hourly usage")
-def cli(username, password, date, daily=True, halfhour=False):
+def cli(username, password, account, date, daily=True, halfhour=False):
     """CLI for this package."""
-    asyncio.run(handle(username, password, date, daily, halfhour))
+    asyncio.run(handle(username, password, account, date, daily, halfhour))
 
 
-async def handle(username, password, date, daily=True, halfhour=False) -> None:
+async def handle(username, password, account, date, daily=True, halfhour=False) -> None:
     client = OVOEnergy()
-    authenticated = await client.authenticate(username, password)
+    authenticated = await client.authenticate(username, password, account)
     print(f"Authenticated: {authenticated}")
     if authenticated:
         print("Authenticated.")

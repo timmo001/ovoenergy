@@ -21,11 +21,12 @@ class OVOEnergy:
     def __init__(self) -> None:
         """Initilalize."""
         self._account_id = None
+        self._account_ids = None
         self._cookies = None
         self._customer_id = None
         self._username = None
 
-    async def authenticate(self, username, password) -> bool:
+    async def authenticate(self, username, password, account=None) -> bool:
         """Authenticate."""
         async with aiohttp.ClientSession() as session:
             response = await session.post(
@@ -56,7 +57,15 @@ class OVOEnergy:
                 )
                 json_response = await response.json()
                 if "accountIds" in json_response:
-                    self._account_id = json_response["accountIds"][0]
+                    self._account_ids = json_response["accountIds"]
+
+                    if account:
+                        if account in self._account_ids:
+                            self._account_id = account
+                        else:
+                            return False
+                    else:
+                        self._account_id = self._account_ids[0]
                 if "customerId" in json_response:
                     self._customer_id = json_response["customerId"]
                 self._username = username
@@ -247,6 +256,17 @@ class OVOEnergy:
     @property
     def account_id(self):
         return self._account_id
+
+    @account_id.setter
+    def account_id(self, new_account):
+        if new_account in self._account_ids:
+            self._account_id = new_account
+        else:
+            print("Invalid account ID")
+
+    @property
+    def account_ids(self):
+        return self._account_ids
 
     @property
     def customer_id(self):
