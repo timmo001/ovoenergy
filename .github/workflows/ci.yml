@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: 🏗 Set up Python ${{ env.DEFAULT_PYTHON }}
         uses: actions/setup-python@v3.0.0
         id: python
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: 🚀 Run JSONLint
         run: |
           sudo apt install -y jsonlint
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: 🚀 Run mdl
         uses: actionshub/markdownlint@2.0.2
   lint-markdown-links:
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: 🚀 Run Markdown Links
         uses: gaurav-nelson/github-action-markdown-link-check@1.0.13
         with:
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: 🚀 Run Prettier
         uses: creyD/prettier_action@v4.2
         with:
@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: 🚀 Run YAMLLint
         uses: ibiqlik/action-yamllint@v3.1
         with:
