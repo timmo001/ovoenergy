@@ -21,7 +21,7 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v3
       - name: 🏗 Set up Python ${{ env.DEFAULT_PYTHON }}
-        uses: actions/setup-python@v3.0.0
+        uses: actions/setup-python@v3.1.0
         id: python
         with:
           python-version: ${{ env.DEFAULT_PYTHON }}
