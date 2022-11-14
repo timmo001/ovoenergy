@@ -80,26 +80,25 @@ class OVOEnergy:
 
             if "code" in json_response and json_response["code"] == "Unknown":
                 return False
-            else:
-                self._cookies = response.cookies
-                response = await session.get(
-                    "https://smartpaym.ovoenergy.com/api/customer-and-account-ids",
-                    cookies=self._cookies,
-                )
-                json_response = await response.json()
-                if "accountIds" in json_response:
-                    self._account_ids = json_response["accountIds"]
+            self._cookies = response.cookies
+            response = await session.get(
+                "https://smartpaym.ovoenergy.com/api/customer-and-account-ids",
+                cookies=self._cookies,
+            )
+            json_response = await response.json()
+            if "accountIds" in json_response:
+                self._account_ids = json_response["accountIds"]
 
-                    if account:
-                        if account in self._account_ids:
-                            self._account_id = account
-                        else:
-                            return False
+                if account:
+                    if account in self._account_ids:
+                        self._account_id = account
                     else:
-                        self._account_id = self._account_ids[0]
-                if "customerId" in json_response:
-                    self._customer_id = json_response["customerId"]
-                self._username = username
+                        return False
+                else:
+                    self._account_id = self._account_ids[0]
+            if "customerId" in json_response:
+                self._customer_id = json_response["customerId"]
+            self._username = username
 
         return True
 
