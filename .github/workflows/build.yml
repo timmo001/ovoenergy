@@ -1,0 +1,32 @@
+---
+name: Build
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-module:
+    uses: timmo001/workflows/.github/workflows/build-python-linux.yml@master
+  build-container-amd64:
+    uses: timmo001/workflows/.github/workflows/build-container-linux.yml@master
+    with:
+      architecture: amd64
+      container-slug: python-template
+  build-container-aarch64:
+    uses: timmo001/workflows/.github/workflows/build-container-linux.yml@master
+    with:
+      architecture: aarch64
+      container-slug: python-template

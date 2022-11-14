@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Module",
+      "type": "python",
+      "request": "launch",
+      "module": "ovoenergy",
+      "preLaunchTask": "Module: pip install",
+      "justMyCode": false,
+      "args": ["version"]
+    }
+  ]
+}

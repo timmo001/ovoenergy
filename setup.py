@@ -1,25 +1,26 @@
-"""Setup configuration."""
-import setuptools
+"""Setup"""
+import io
 
-with open("README.md", "r") as fh:
-    LONG = fh.read()
+from setuptools import find_packages, setup
 
-setuptools.setup(
+# Get setup packages from requirements.txt
+with io.open("requirements_setup.txt", encoding="utf-8") as f:
+    requirements_setup = f.read().splitlines()
+
+# Get packages from requirements.txt
+with io.open("requirements.txt", encoding="utf-8") as f:
+    requirements = f.read().splitlines()
+
+setup(
     name="ovoenergy",
-    version="1.2.0",
-    author="Timmo",
+    description="OVO Energy",
+    keywords="python ovoenergy",
+    author="Aidan Timson (Timmo)",
     author_email="contact@timmo.xyz",
-    description="Get energy data from OVO's API",
     license="MIT",
-    long_description=LONG,
-    long_description_content_type="text/markdown",
-    install_requires=["aiohttp>=3.7.3", "click>=7.1.2"],
-    entry_points={"console_scripts": ["ovoenergy = ovoenergy.cli:cli"]},
     url="https://github.com/timmo001/ovoenergy",
-    packages=setuptools.find_packages(),
-    classifiers=(
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ),
+    packages=find_packages(exclude=["tests", "generator"]),
+    install_requires=requirements,
+    setup_requires=requirements_setup,
+    use_incremental=True,
 )

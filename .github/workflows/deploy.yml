@@ -6,30 +6,31 @@ on:
   release:
     types:
       - published
-  workflow_run:
-    workflows: ["CI"]
-    branches: [master]
-    types:
-      - completed
+  # schedule:
+  #   - cron: "0 2 * * *"
+  workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4.3.0
-        with:
-          python-version: "3.x"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install setuptools wheel twine
-      - name: Build and publish
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          python setup.py sdist bdist_wheel
-          twine upload dist/*
+  deploy-module:
+    uses: timmo001/workflows/.github/workflows/deploy-python-linux.yml@master
+    secrets:
+      PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+      PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
+      PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+    with:
+      module-name: ovoenergy
+      use-incremental: true
+  deploy-container-amd64:
+    needs:
+      - deploy-module
+    uses: timmo001/workflows/.github/workflows/deploy-container-linux.yml@master
+    with:
+      architecture: amd64
+      container-slug: python-template
+  deploy-container-aarch64:
+    needs:
+      - deploy-module
+    uses: timmo001/workflows/.github/workflows/deploy-container-linux.yml@master
+    with:
+      architecture: aarch64
+      container-slug: python-template
