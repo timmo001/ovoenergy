@@ -7,8 +7,9 @@ from typing import Optional
 
 import typer
 
-from . import OVODailyUsage, OVOHalfHourUsage
 from ._version import __version__
+from .models import OVODailyUsage, OVOHalfHourUsage
+from .models.plan import OVOPlan
 from .ovoenergy import OVOEnergy
 
 app = typer.Typer()
@@ -67,6 +68,28 @@ def half_hourly(
 
     typer.secho(
         ovo_usage.json() if ovo_usage is not None else '{"message": "No data"}',
+        fg=typer.colors.GREEN,
+    )
+
+
+@app.command(name="plan", short_help="Get plan from OVO Energy")
+def plan(
+    username: str = typer.Option(..., help="OVO Energy username"),
+    password: str = typer.Option(..., help="OVO Energy password"),
+    account: str = typer.Option(None, help="OVO Energy account number"),
+) -> None:
+    """Get rates from OVO Energy."""
+    ovo_plan: Optional[OVOPlan] = None
+
+    client = OVOEnergy()
+    authenticated = loop.run_until_complete(
+        client.authenticate(username, password, account)
+    )
+    if authenticated:
+        ovo_plan = loop.run_until_complete(client.get_plan())
+
+    typer.secho(
+        ovo_plan.json() if ovo_plan is not None else '{"message": "No data"}',
         fg=typer.colors.GREEN,
     )
 

@@ -2,17 +2,19 @@
 from __future__ import annotations
 
 from http.cookies import SimpleCookie
+from json import dumps
 from typing import Optional
 
 import aiohttp
 
-from ovoenergy import (
+from .models import (
     OVODailyElectricity,
     OVODailyGas,
     OVODailyUsage,
     OVOHalfHour,
     OVOHalfHourUsage,
 )
+from .models.plan import OVOPlan, OVOPlanElectricity, OVOPlanGas
 
 
 class OVOEnergy:
@@ -170,3 +172,14 @@ class OVOEnergy:
                         ovo_usage.gas.append(OVOHalfHour(**usage))
 
         return ovo_usage
+
+    async def get_plan(self) -> OVOPlan:
+        """Get plan."""
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(
+                f"https://smartpaymapi.ovoenergy.com/orex/api/plans/{self._account_id}",
+                cookies=self._cookies,
+            )
+            json_response = await response.json()
+
+        return OVOPlan(**json_response)
