@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from http.cookies import SimpleCookie
-from json import dumps
 from typing import Optional
 
 import aiohttp
@@ -14,7 +13,7 @@ from .models import (
     OVOHalfHour,
     OVOHalfHourUsage,
 )
-from .models.plan import OVOPlan, OVOPlanElectricity, OVOPlanGas
+from .models.plan import OVOPlan
 
 
 class OVOEnergy:
