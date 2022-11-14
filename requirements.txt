@@ -1,3 +1,4 @@
 aiohttp>=3.7.3
 click>=7.1.2
+incremental==22.10.0
 pydantic>=1.10.2
