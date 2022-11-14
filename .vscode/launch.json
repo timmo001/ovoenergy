@@ -7,9 +7,8 @@
       "request": "launch",
       "module": "ovoenergy",
       "preLaunchTask": "Module: pip install",
-      "cwd": "${workspaceFolder}/module",
       "justMyCode": false,
-      "args": []
+      "args": ["version"]
     }
   ]
 }

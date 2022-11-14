@@ -1,5 +1,9 @@
-"""Get energy data from OVO's API."""
+"""OVO Energy: Get energy data from OVO's API."""
+from __future__ import annotations
+
 from datetime import datetime, timedelta
+from http.cookies import SimpleCookie
+from typing import Optional
 
 import aiohttp
 
@@ -20,11 +24,37 @@ class OVOEnergy:
 
     def __init__(self) -> None:
         """Initilalize."""
-        self._account_id = None
-        self._account_ids = None
-        self._cookies = None
-        self._customer_id = None
-        self._username = None
+        self._account_id: Optional[str] = None
+        self._account_ids: list[str] = []
+        self._cookies: Optional[SimpleCookie[str]] = None
+        self._customer_id: Optional[str] = None
+        self._username: Optional[str] = None
+
+    @property
+    def account_id(self):
+        return self._account_id
+
+    @account_id.setter
+    def account_id(
+        self,
+        new_account: str,
+    ):
+        if new_account in self._account_ids:
+            self._account_id = new_account
+        else:
+            raise ValueError("Invalid account ID")
+
+    @property
+    def account_ids(self):
+        return self._account_ids
+
+    @property
+    def customer_id(self):
+        return self._customer_id
+
+    @property
+    def username(self):
+        return self._username
 
     async def authenticate(self, username, password, account=None) -> bool:
         """Authenticate."""
@@ -43,7 +73,7 @@ class OVOEnergy:
             except:
                 pass
 
-            if response.status is not 200:
+            if response.status != 200:
                 return False
             json_response = await response.json()
 
@@ -72,16 +102,19 @@ class OVOEnergy:
 
         return True
 
-    async def get_daily_usage(self, month: str) -> OVODailyUsage:
+    async def get_daily_usage(
+        self,
+        date: str,
+    ) -> Optional[OVODailyUsage]:
         """Get daily usage data."""
-        if month is None:
+        if date is None:
             return None
-        electricity_usage = None
-        gas_usage = None
+
+        ovo_usage = OVODailyUsage()
 
         async with aiohttp.ClientSession() as session:
             response = await session.get(
-                f"https://smartpaym.ovoenergy.com/api/energy-usage/daily/{self._account_id}?date={month}",
+                f"https://smartpaym.ovoenergy.com/api/energy-usage/daily/{self._account_id}?date={date}",
                 cookies=self._cookies,
             )
             json_response = await response.json()
@@ -89,92 +122,30 @@ class OVOEnergy:
         if "electricity" in json_response:
             electricity = json_response["electricity"]
             if electricity and "data" in electricity:
-                electricity_usage = []
+                ovo_usage.electricity = []
                 for usage in electricity["data"]:
                     if usage is not None:
-                        electricity_usage.append(
-                            OVODailyElectricity(
-                                usage["consumption"]
-                                if "consumption" in usage
-                                else None,
-                                OVOInterval(
-                                    datetime.strptime(
-                                        usage["interval"]["start"],
-                                        "%Y-%m-%dT%H:%M:%S.%f",
-                                    ),
-                                    datetime.strptime(
-                                        usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
-                                    ),
-                                )
-                                if "interval" in usage
-                                and "start" in usage["interval"]
-                                and "end" in usage["interval"]
-                                else None,
-                                OVOMeterReadings(
-                                    usage["meterReadings"]["start"],
-                                    usage["meterReadings"]["end"],
-                                )
-                                if "meterReadings" in usage
-                                else None,
-                                usage["hasHhData"] if "hasHhData" in usage else None,
-                                OVOCost(
-                                    usage["cost"]["amount"],
-                                    usage["cost"]["currencyUnit"],
-                                )
-                                if "cost" in usage
-                                else None,
-                            )
-                        )
+                        ovo_usage.electricity.append(OVODailyElectricity(**usage))
 
         if "gas" in json_response:
             gas = json_response["gas"]
             if gas and "data" in gas:
-                gas_usage = []
+                ovo_usage.gas = []
                 for usage in gas["data"]:
                     if usage is not None:
-                        gas_usage.append(
-                            OVODailyGas(
-                                usage["consumption"]
-                                if "consumption" in usage
-                                else None,
-                                usage["volume"] if "volume" in usage else None,
-                                OVOInterval(
-                                    datetime.strptime(
-                                        usage["interval"]["start"],
-                                        "%Y-%m-%dT%H:%M:%S.%f",
-                                    ),
-                                    datetime.strptime(
-                                        usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
-                                    ),
-                                )
-                                if "interval" in usage
-                                and "start" in usage["interval"]
-                                and "end" in usage["interval"]
-                                else None,
-                                OVOMeterReadings(
-                                    usage["meterReadings"]["start"],
-                                    usage["meterReadings"]["end"],
-                                )
-                                if "meterReadings" in usage
-                                else None,
-                                usage["hasHhData"] if "hasHhData" in usage else None,
-                                OVOCost(
-                                    usage["cost"]["amount"],
-                                    usage["cost"]["currencyUnit"],
-                                )
-                                if "cost" in usage
-                                else None,
-                            )
-                        )
+                        ovo_usage.gas.append(OVODailyGas(**usage))
 
-        return OVODailyUsage(electricity_usage, gas_usage)
+        return ovo_usage
 
-    async def get_half_hourly_usage(self, date: str) -> OVOHalfHourUsage:
+    async def get_half_hourly_usage(
+        self,
+        date: str,
+    ) -> Optional[OVOHalfHourUsage]:
         """Get half hourly usage data."""
         if date is None:
             return None
-        electricity_usage = None
-        gas_usage = None
+
+        ovo_usage = OVOHalfHourUsage()
 
         async with aiohttp.ClientSession() as session:
             response = await session.get(
@@ -186,61 +157,24 @@ class OVOEnergy:
         if "electricity" in json_response:
             electricity = json_response["electricity"]
             if electricity and "data" in electricity:
-                electricity_usage = []
+                ovo_usage.electricity = []
                 for usage in electricity["data"]:
                     if usage is not None:
-                        electricity_usage.append(
-                            OVOHalfHour(
-                                usage["consumption"]
-                                if "consumption" in usage
-                                else None,
-                                OVOInterval(
-                                    datetime.strptime(
-                                        usage["interval"]["start"],
-                                        "%Y-%m-%dT%H:%M:%S.%f",
-                                    ),
-                                    datetime.strptime(
-                                        usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
-                                    ),
-                                )
-                                if "interval" in usage
-                                and "start" in usage["interval"]
-                                and "end" in usage["interval"]
-                                else None,
-                                usage["unit"] if "unit" in usage else None,
-                            )
-                        )
+                        ovo_usage.electricity.append(OVOHalfHour(**usage))
         if "gas" in json_response:
             gas = json_response["gas"]
             if gas and "data" in gas:
-                gas_usage = []
+                ovo_usage.gas = []
                 for usage in gas["data"]:
                     if usage is not None:
-                        gas_usage.append(
-                            OVOHalfHour(
-                                usage["consumption"]
-                                if "consumption" in usage
-                                else None,
-                                OVOInterval(
-                                    datetime.strptime(
-                                        usage["interval"]["start"],
-                                        "%Y-%m-%dT%H:%M:%S.%f",
-                                    ),
-                                    datetime.strptime(
-                                        usage["interval"]["end"], "%Y-%m-%dT%H:%M:%S.%f"
-                                    ),
-                                )
-                                if "interval" in usage
-                                and "start" in usage["interval"]
-                                and "end" in usage["interval"]
-                                else None,
-                                usage["unit"] if "unit" in usage else None,
-                            )
-                        )
+                        ovo_usage.gas.append(OVOHalfHour(**usage))
 
-        return OVOHalfHourUsage(electricity_usage, gas_usage)
+        return ovo_usage
 
-    async def get_last_reading(self, date: datetime = None) -> OVOHalfHourUsage:
+    async def get_last_reading(
+        self,
+        date: Optional[datetime] = None,
+    ) -> Optional[OVOHalfHourUsage]:
         date = date if date is not None else datetime.utcnow()
         print(f"DATE: {date}")
         usage: OVOHalfHourUsage = await self.get_half_hourly_usage(
@@ -252,26 +186,3 @@ class OVOEnergy:
                 return None
             return await self.get_last_reading(date)
         return usage
-
-    @property
-    def account_id(self):
-        return self._account_id
-
-    @account_id.setter
-    def account_id(self, new_account):
-        if new_account in self._account_ids:
-            self._account_id = new_account
-        else:
-            print("Invalid account ID")
-
-    @property
-    def account_ids(self):
-        return self._account_ids
-
-    @property
-    def customer_id(self):
-        return self._customer_id
-
-    @property
-    def username(self):
-        return self._username

@@ -6,9 +6,7 @@
       "label": "Module: pip install",
       "command": "pip install .",
       "dependsOn": [],
-      "options": {
-        "cwd": "module"
-      }
+      "options": {}
     }
   ]
 }
