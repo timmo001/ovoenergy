@@ -13,6 +13,7 @@ from .models import (
     OVOHalfHour,
     OVOHalfHourUsage,
 )
+from .models.carbon_intensity import OVOCarbonIntensity
 from .models.footprint import OVOFootprint
 from .models.plan import OVOPlan
 
@@ -194,3 +195,14 @@ class OVOEnergy:
             json_response = await response.json()
 
         return OVOFootprint(**json_response)
+
+    async def get_carbon_intensity(self):
+        """Get carbon intensity."""
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(
+                f"https://smartpaymapi.ovoenergy.com/carbon-bff/carbonintensity",
+                cookies=self._cookies,
+            )
+            json_response = await response.json()
+
+        return OVOCarbonIntensity(**json_response)
