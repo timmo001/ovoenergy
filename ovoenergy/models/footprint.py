@@ -1,7 +1,7 @@
 """OVO Energy: Footprint Models."""
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import Field
 
@@ -45,7 +45,7 @@ class OVOFootprint(OVOBase):
 
     from_: Optional[str] = Field(None, alias="from")
     to: Optional[str] = Field(None, alias="to")
-    carbon_reduction_product_ids: Optional[List] = Field(
+    carbon_reduction_product_ids: Optional[list] = Field(
         None, alias="carbonReductionProductIds"
     )
     carbon_footprint: Optional[OVOCarbonFootprint] = Field(
