@@ -9,6 +9,7 @@ import typer
 
 from ._version import __version__
 from .models import OVODailyUsage, OVOHalfHourUsage
+from .models.carbon_intensity import OVOCarbonIntensity
 from .models.footprint import OVOFootprint
 from .models.plan import OVOPlan
 from .ovoenergy import OVOEnergy
@@ -95,8 +96,8 @@ def plan(
     )
 
 
-@app.command(name="footprint", short_help="Get carbon footprint from OVO Energy")
-def footprint(
+@app.command(name="carbon-footprint", short_help="Get carbon footprint from OVO Energy")
+def carbon_footprint(
     username: str = typer.Option(..., help="OVO Energy username"),
     password: str = typer.Option(..., help="OVO Energy password"),
     account: str = typer.Option(None, help="OVO Energy account number"),
@@ -113,6 +114,30 @@ def footprint(
 
     typer.secho(
         ovo_footprint.json() if ovo_footprint is not None else '{"message": "No data"}',
+        fg=typer.colors.GREEN,
+    )
+
+
+@app.command(name="carbon-intensity", short_help="Get carbon intensity from OVO Energy")
+def carbon_intensity(
+    username: str = typer.Option(..., help="OVO Energy username"),
+    password: str = typer.Option(..., help="OVO Energy password"),
+    account: str = typer.Option(None, help="OVO Energy account number"),
+) -> None:
+    """Get carbon intensity from OVO Energy."""
+    ovo_carbon_intensity: Optional[OVOCarbonIntensity] = None
+
+    client = OVOEnergy()
+    authenticated = loop.run_until_complete(
+        client.authenticate(username, password, account)
+    )
+    if authenticated:
+        ovo_carbon_intensity = loop.run_until_complete(client.get_carbon_intensity())
+
+    typer.secho(
+        ovo_carbon_intensity.json()
+        if ovo_carbon_intensity is not None
+        else '{"message": "No data"}',
         fg=typer.colors.GREEN,
     )
 
