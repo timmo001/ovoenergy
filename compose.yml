@@ -1,6 +1,6 @@
 ---
 services:
-  python-template:
+  ovoenergy:
     build: .
     restart: unless-stopped
     ports:
@@ -9,8 +9,8 @@ services:
         protocol: tcp
     volumes:
       - type: volume
-        source: python-template-data
-        target: /data/python-template
+        source: ovoenergy-data
+        target: /data/ovoenergy
 
 volumes:
-  python-template-data: {}
+  ovoenergy-data: {}
