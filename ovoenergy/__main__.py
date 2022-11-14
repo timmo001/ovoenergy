@@ -39,18 +39,9 @@ def daily(
         ovo_usage = loop.run_until_complete(client.get_daily_usage(date))
 
     typer.secho(
-        f"Daily usage for {date} for {client.username} ({client.account_id}):",
-        fg=typer.colors.CYAN,
+        ovo_usage.json() if ovo_usage is not None else '{"message": "No data"}',
+        fg=typer.colors.GREEN,
     )
-    if ovo_usage is not None:
-        typer.secho(f"  Electricity: {ovo_usage.electricity}", fg=typer.colors.CYAN)
-        typer.secho(f"  Gas: {ovo_usage.gas}", fg=typer.colors.CYAN)
-    else:
-        typer.secho("  No data found", fg=typer.colors.RED)
-    # typer.secho(
-    #     ovo_usage.json() if ovo_usage is not None else '{"message": "No data"}',
-    #     fg=typer.colors.GREEN,
-    # )
 
 
 @app.command(name="halfhourly", short_help="Get half hourly usage from OVO Energy")
@@ -71,8 +62,8 @@ def half_hourly(
     authenticated = loop.run_until_complete(
         client.authenticate(username, password, account)
     )
-    # if authenticated:
-    #     ovo_usage = loop.run_until_complete(client.get_half_hourly_usage(date))
+    if authenticated:
+        ovo_usage = loop.run_until_complete(client.get_half_hourly_usage(date))
 
     typer.secho(
         ovo_usage.json() if ovo_usage is not None else '{"message": "No data"}',

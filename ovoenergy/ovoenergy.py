@@ -170,19 +170,3 @@ class OVOEnergy:
                         ovo_usage.gas.append(OVOHalfHour(**usage))
 
         return ovo_usage
-
-    async def get_last_reading(
-        self,
-        date: Optional[datetime] = None,
-    ) -> Optional[OVOHalfHourUsage]:
-        date = date if date is not None else datetime.utcnow()
-        print(f"DATE: {date}")
-        usage: OVOHalfHourUsage = await self.get_half_hourly_usage(
-            date.strftime("%Y-%m-%d")
-        )
-        if usage is None or usage.electricity is None or len(usage.electricity) == 0:
-            date = date - timedelta(days=1)
-            if date is datetime.utcnow() - timedelta(days=7):
-                return None
-            return await self.get_last_reading(date)
-        return usage
