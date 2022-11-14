@@ -114,7 +114,7 @@ class OVOEnergy:
 
         async with aiohttp.ClientSession() as session:
             response = await session.get(
-                f"https://smartpaym.ovoenergy.com/api/energy-usage/daily/{self._account_id}?date={date}",
+                f"https://smartpaymapi.ovoenergy.com/usage/api/daily/{self._account_id}?date={date}",
                 cookies=self._cookies,
             )
             json_response = await response.json()
@@ -149,7 +149,7 @@ class OVOEnergy:
 
         async with aiohttp.ClientSession() as session:
             response = await session.get(
-                f"https://smartpaym.ovoenergy.com/api/energy-usage/half-hourly/{self._account_id}?date={date}",
+                f"https://smartpaymapi.ovoenergy.com/usage/api/half-hourly/{self._account_id}?date={date}",
                 cookies=self._cookies,
             )
             json_response = await response.json()
