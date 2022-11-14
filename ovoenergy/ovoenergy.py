@@ -71,7 +71,7 @@ class OVOEnergy:
 
             try:
                 response.raise_for_status()
-            except:
+            except aiohttp.ClientResponseError:
                 pass
 
             if response.status != 200:
