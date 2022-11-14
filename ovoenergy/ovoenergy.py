@@ -32,6 +32,7 @@ class OVOEnergy:
 
     @property
     def account_id(self):
+        """Return account id."""
         return self._account_id
 
     @account_id.setter
@@ -39,6 +40,7 @@ class OVOEnergy:
         self,
         new_account: str,
     ):
+        """Set account id."""
         if new_account in self._account_ids:
             self._account_id = new_account
         else:
@@ -46,14 +48,17 @@ class OVOEnergy:
 
     @property
     def account_ids(self):
+        """Return account ids."""
         return self._account_ids
 
     @property
     def customer_id(self):
+        """Return customer id."""
         return self._customer_id
 
     @property
     def username(self):
+        """Return username."""
         return self._username
 
     async def authenticate(self, username, password, account=None) -> bool:
