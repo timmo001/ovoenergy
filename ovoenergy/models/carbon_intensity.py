@@ -9,6 +9,8 @@ from . import OVOBase
 
 
 class OVOCarbonIntensityForecast(OVOBase):
+    """Carbon intensity forecast model."""
+
     time_from: str = Field(None, alias="from")
     intensity: float = Field(None, alias="intensity")
     level: str = Field(None, alias="level")
@@ -17,6 +19,8 @@ class OVOCarbonIntensityForecast(OVOBase):
 
 
 class OVOCarbonIntensity(OVOBase):
+    """Carbon intensity model."""
+
     forecast: Optional[list[OVOCarbonIntensityForecast]] = Field(None, alias="forecast")
     current: Optional[str] = Field(None, alias="current")
     greentime: Optional[Any] = Field(None, alias="greentime")

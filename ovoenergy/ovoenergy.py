@@ -200,7 +200,7 @@ class OVOEnergy:
         """Get carbon intensity."""
         async with aiohttp.ClientSession() as session:
             response = await session.get(
-                f"https://smartpaymapi.ovoenergy.com/carbon-bff/carbonintensity",
+                "https://smartpaymapi.ovoenergy.com/carbon-bff/carbonintensity",
                 cookies=self._cookies,
             )
             json_response = await response.json()
