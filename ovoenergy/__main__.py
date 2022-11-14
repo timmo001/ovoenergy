@@ -25,8 +25,8 @@ def daily(
 ) -> None:
     """Get daily usage from OVO Energy."""
     if date is None:
-        # Get yesterday's date
-        date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        # Get this month
+        date = datetime.now().strftime("%Y-%m")
 
     ovo_usage: Optional[OVODailyUsage] = None
 
