@@ -1,0 +1,16 @@
+---
+services:
+  python-template:
+    build: .
+    restart: unless-stopped
+    ports:
+      - target: 9170
+        published: 9170
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: python-template-data
+        target: /data/python-template
+
+volumes:
+  python-template-data: {}

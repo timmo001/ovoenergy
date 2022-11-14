@@ -6,7 +6,7 @@ updates:
     schedule:
       interval: daily
   - package-ecosystem: "pip"
-    directory: "/"
+    directory: "/ovoenergy"
     open-pull-requests-limit: 20
     schedule:
       interval: "daily"

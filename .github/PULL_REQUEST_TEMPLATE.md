@@ -4,7 +4,7 @@
 
 ## Related Issues
 
-> (Github link to related issues or pull requests)
+> (GitHub link to related issues or pull requests)
 
 ## Checklist
 
