@@ -69,15 +69,15 @@ class OVOHalfHour(OVOBase):
 class OVODailyUsage(OVOBase):
     """Daily usage model."""
 
-    electricity: Optional[list[OVODailyElectricity]] = Field(None, alias="electricity")
-    gas: Optional[list[OVODailyGas]] = Field(None, alias="gas")
+    electricity: list[OVODailyElectricity] = Field([], alias="electricity")
+    gas: list[OVODailyGas] = Field([], alias="gas")
 
 
 class OVOHalfHourUsage(OVOBase):
     """Half hour usage model."""
 
-    electricity: Optional[list[OVOHalfHour]] = Field(None, alias="electricity")
-    gas: Optional[list[OVOHalfHour]] = Field(None, alias="gas")
+    electricity: list[OVOHalfHour] = Field([], alias="electricity")
+    gas: list[OVOHalfHour] = Field([], alias="gas")
 
 
 class OVOPlan(OVOBase):

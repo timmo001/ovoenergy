@@ -21,6 +21,6 @@ class OVOCarbonIntensityForecast(OVOBase):
 class OVOCarbonIntensity(OVOBase):
     """Carbon intensity model."""
 
-    forecast: Optional[list[OVOCarbonIntensityForecast]] = Field(None, alias="forecast")
+    forecast: list[OVOCarbonIntensityForecast] = Field([], alias="forecast")
     current: Optional[str] = Field(None, alias="current")
     greentime: Optional[Any] = Field(None, alias="greentime")
