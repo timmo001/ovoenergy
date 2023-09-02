@@ -96,7 +96,7 @@ def plan(
     )
 
 @app.command(name="readings", short_help="Get latest readings from OVO Energy")
-def plan(
+def readings(
     username: str = typer.Option(..., help="OVO Energy username"),
     password: str = typer.Option(..., help="OVO Energy password"),
     account: str = typer.Option(None, help="OVO Energy account number"),
