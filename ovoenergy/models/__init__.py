@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Extra, Field  # pylint: disable=no-name-in-module
+from pydantic import BaseModel, Extra, Field, AliasChoices  # pylint: disable=no-name-in-module
 
 
 class OVOBase(BaseModel):
@@ -86,3 +86,16 @@ class OVOPlan(OVOBase):
     standing_charge: Optional[float] = Field(None, alias="standingCharge")
     unit_rate: Optional[float] = Field(None, alias="unitRate")
     tariff: Optional[str] = Field(None, alias="tariff")
+
+class OVOReading(OVOBase):
+    """Reading model."""
+
+    reading_date: datetime = Field(None, alias="readingDateTime")
+    reading_type: str = Field(None, alias="readingType")
+    reading: float = Field(None, alias=AliasChoices("gasVolume","reading"))
+
+class OVOReadings(OVOBase):
+    """Readings model."""
+
+    electricity: OVOReading = Field(None, alias="electricity")
+    gas: OVOReading = Field(None, alias="gas")

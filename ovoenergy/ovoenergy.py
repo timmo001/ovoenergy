@@ -12,6 +12,8 @@ from .models import (
     OVODailyUsage,
     OVOHalfHour,
     OVOHalfHourUsage,
+    OVOReadings,
+    OVOReading
 )
 from .models.carbon_intensity import OVOCarbonIntensity
 from .models.footprint import OVOFootprint
@@ -173,6 +175,39 @@ class OVOEnergy:
                         ovo_usage.gas.append(OVOHalfHour(**usage))
 
         return ovo_usage
+
+    async def get_latest_readings(
+        self,
+    ) -> Optional[OVOReadings]:
+        """Get daily usage data."""
+        plan = await self.get_plan()
+
+        ovo_readings = OVOReadings()
+
+        if plan.electricity is not None:
+            async with aiohttp.ClientSession() as session:
+                response = await session.get(
+                    f"https://smartpaymapi.ovoenergy.com/rlc/rac-public-api/api/v5/supplypoints/electricity/{plan.electricity.mpxn}/meters/{plan.electricity.msn}/readings?limit=1",
+                    cookies=self._cookies,
+                )
+                json_response = await response.json()
+                if len(json_response) > 0:
+                    if 'tiers' in json_response[0]:
+                        json_response[0]['reading'] = sum([t['meterRegisterReading'] for t in json_response[0]['tiers']])
+                    ovo_readings.electricity = OVOReading(**json_response[0])
+
+
+        if plan.gas is not None:
+            async with aiohttp.ClientSession() as session:
+                response = await session.get(
+                    f"https://smartpaymapi.ovoenergy.com/rlc/rac-public-api/api/v5/supplypoints/gas/{plan.gas.mpxn}/meters/{plan.gas.msn}/readings?limit=1",
+                    cookies=self._cookies,
+                )
+                json_response = await response.json()
+                if len(json_response) > 0:
+                    ovo_readings.gas = OVOReading(**json_response[0])
+
+        return ovo_readings
 
     async def get_plan(self) -> OVOPlan:
         """Get plan."""
