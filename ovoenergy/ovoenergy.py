@@ -13,7 +13,7 @@ from .models import (
     OVOHalfHour,
     OVOHalfHourUsage,
     OVOReadings,
-    OVOReading
+    OVOReading,
 )
 from .models.carbon_intensity import OVOCarbonIntensity
 from .models.footprint import OVOFootprint
@@ -192,10 +192,11 @@ class OVOEnergy:
                 )
                 json_response = await response.json()
                 if len(json_response) > 0:
-                    if 'tiers' in json_response[0]:
-                        json_response[0]['reading'] = sum([t['meterRegisterReading'] for t in json_response[0]['tiers']])
+                    if "tiers" in json_response[0]:
+                        json_response[0]["reading"] = sum(
+                            t["meterRegisterReading"] for t in json_response[0]["tiers"]
+                        )
                     ovo_readings.electricity = OVOReading(**json_response[0])
-
 
         if plan.gas is not None:
             async with aiohttp.ClientSession() as session:
