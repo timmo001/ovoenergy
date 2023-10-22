@@ -16,7 +16,7 @@ setup(
     description="OVO Energy",
     keywords="python ovoenergy",
     author="Aidan Timson (Timmo)",
-    author_email="contact@timmo.xyz",
+    author_email="aidan@timmo.dev",
     license="MIT",
     url="https://github.com/timmo001/ovoenergy",
     packages=find_packages(exclude=["tests", "generator"]),
