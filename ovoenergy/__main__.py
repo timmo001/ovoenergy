@@ -8,7 +8,7 @@ from typing import Optional
 import typer
 
 from ._version import __version__
-from .models import OVODailyUsage, OVOHalfHourUsage
+from .models import OVODailyUsage, OVOHalfHourUsage, OVOReadings
 from .models.carbon_intensity import OVOCarbonIntensity
 from .models.footprint import OVOFootprint
 from .models.plan import OVOPlan
@@ -92,6 +92,28 @@ def plan(
 
     typer.secho(
         ovo_plan.json() if ovo_plan is not None else '{"message": "No data"}',
+        fg=typer.colors.GREEN,
+    )
+
+
+@app.command(name="readings", short_help="Get latest readings from OVO Energy")
+def readings(
+    username: str = typer.Option(..., help="OVO Energy username"),
+    password: str = typer.Option(..., help="OVO Energy password"),
+    account: str = typer.Option(None, help="OVO Energy account number"),
+) -> None:
+    """Get rates from OVO Energy."""
+    ovo_readings: Optional[OVOReadings] = None
+
+    client = OVOEnergy()
+    authenticated = loop.run_until_complete(
+        client.authenticate(username, password, account)
+    )
+    if authenticated:
+        ovo_readings = loop.run_until_complete(client.get_latest_readings())
+
+    typer.secho(
+        ovo_readings.json() if ovo_readings is not None else '{"message": "No data"}',
         fg=typer.colors.GREEN,
     )
 
