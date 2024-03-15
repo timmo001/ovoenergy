@@ -1,7 +1,7 @@
 """OVO Energy: Plan Models."""
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import Field
 
@@ -70,4 +70,4 @@ class OVOPlan(OVOBase):
     """Plan model."""
 
     electricity: OVOPlanElectricity = Field(None, alias="electricity")
-    gas: OVOPlanGas = Field(None, alias="gas")
+    gas: Optional[OVOPlanGas] = Field(None, alias="gas")
