@@ -1,12 +1,17 @@
 """Tests for the client module."""
 
+from datetime import datetime, timedelta
+
 from aioresponses import aioresponses
 import pytest
 from syrupy.assertion import SnapshotAssertion
-from syrupy.filters import paths
 
 from ovoenergy import OVOEnergy
-from ovoenergy.exceptions import OVOEnergyNoAccount
+from ovoenergy.exceptions import (
+    OVOEnergyAPINoCookies,
+    OVOEnergyAPINotAuthorized,
+    OVOEnergyNoAccount,
+)
 
 from . import ACCOUNT, ACCOUNT_BAD, PASSWORD, USERNAME
 
@@ -32,6 +37,18 @@ async def test_authorize(
     )
     assert ovoenergy_client.oauth.refresh_expires_in == snapshot(
         name="authorize_oauth_refresh_expires_in",
+    )
+    assert ovoenergy_client.account_id == snapshot(
+        name="authorize_account_id",
+    )
+    assert ovoenergy_client.account_ids == snapshot(
+        name="authorize_account_id",
+    )
+    assert ovoenergy_client.customer_id == snapshot(
+        name="authorize_customer_id",
+    )
+    assert ovoenergy_client.username == snapshot(
+        name="authorize_username",
     )
 
 
@@ -133,7 +150,7 @@ async def test_bootstrap_custom_account(
     mock_aioresponse: aioresponses,
     snapshot: SnapshotAssertion,
 ) -> None:
-    """Test get_daily_usage."""
+    """Test bootstrap custom account."""
     await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
     ovoenergy_client.custom_account_id = ACCOUNT
@@ -146,11 +163,11 @@ async def test_bootstrap_custom_account(
 
 
 @pytest.mark.asyncio
-async def test_account_bad(
+async def test_bad_account(
     ovoenergy_client: OVOEnergy,
     mock_aioresponse: aioresponses,
 ) -> None:
-    """Test get_daily_usage."""
+    """Test bad account."""
     await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
     await ovoenergy_client.bootstrap_accounts()
@@ -158,4 +175,68 @@ async def test_account_bad(
     ovoenergy_client.custom_account_id = ACCOUNT_BAD
 
     with pytest.raises(OVOEnergyNoAccount):
+        await ovoenergy_client.get_daily_usage("2024-01")
+
+
+# pylint: disable=protected-access
+@pytest.mark.asyncio
+async def test_no_cookies(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """Test no cookies."""
+    await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+
+    await ovoenergy_client.bootstrap_accounts()
+
+    ovoenergy_client._cookies = None
+
+    with pytest.raises(OVOEnergyAPINoCookies):
+        await ovoenergy_client.get_daily_usage("2024-01")
+
+
+# pylint: disable=protected-access
+async def test_no_auth(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """Test no auth."""
+    await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+
+    await ovoenergy_client.bootstrap_accounts()
+
+    ovoenergy_client._oauth = None
+
+    with pytest.raises(OVOEnergyAPINotAuthorized):
+        await ovoenergy_client.get_daily_usage("2024-01")
+
+
+# pylint: disable=protected-access
+async def test_oauth_expired(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """Test oauth expired."""
+    an_hour_ago = datetime.now() - timedelta(hours=1)
+
+    await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+
+    await ovoenergy_client.bootstrap_accounts()
+
+    assert ovoenergy_client._oauth is not None
+
+    ovoenergy_client._oauth.expires_at = an_hour_ago
+
+    await ovoenergy_client.get_daily_usage("2024-01")
+
+    ovoenergy_client._oauth.expires_at = an_hour_ago
+
+    mock_aioresponse.clear()
+    mock_aioresponse.get(
+        "https://my.ovoenergy.com/api/v2/auth/token",
+        status=403,
+        repeat=True,
+    )
+
+    with pytest.raises(OVOEnergyAPINotAuthorized):
         await ovoenergy_client.get_daily_usage("2024-01")
