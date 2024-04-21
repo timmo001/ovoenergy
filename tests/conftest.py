@@ -12,6 +12,7 @@ from . import (
     RESPONSE_JSON_AUTH,
     RESPONSE_JSON_BOOTSTRAP_ACCOUNTS,
     RESPONSE_JSON_DAILY_USAGE,
+    RESPONSE_JSON_PLANS,
     RESPONSE_JSON_TOKEN,
 )
 
@@ -41,6 +42,18 @@ def mock_aioresponse():
         mocker.get(
             f"https://smartpaymapi.ovoenergy.com/usage/api/daily/{RESPONSE_JSON_BOOTSTRAP_ACCOUNTS['selectedAccountId']}?date=2024-01",
             payload=RESPONSE_JSON_DAILY_USAGE,
+            status=200,
+            repeat=True,
+        )
+        mocker.get(
+            f"https://smartpaymapi.ovoenergy.com/usage/api/half-hourly/{RESPONSE_JSON_BOOTSTRAP_ACCOUNTS['selectedAccountId']}?date=2024-01-01",
+            payload=RESPONSE_JSON_DAILY_USAGE,
+            status=200,
+            repeat=True,
+        )
+        mocker.get(
+            f"https://smartpaymapi.ovoenergy.com/orex/api/plans/{RESPONSE_JSON_BOOTSTRAP_ACCOUNTS['selectedAccountId']}",
+            payload=RESPONSE_JSON_PLANS,
             status=200,
             repeat=True,
         )

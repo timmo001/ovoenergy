@@ -65,6 +65,38 @@ async def test_get_daily_usage(
     )
 
 
+@pytest.mark.asyncio
+async def test_get_half_hourly_usage(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+    snapshot: SnapshotAssertion,
+) -> None:
+    """Test daily."""
+    await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+
+    await ovoenergy_client.bootstrap_accounts()
+
+    assert await ovoenergy_client.get_half_hourly_usage("2024-01-01") == snapshot(
+        name="half_hourly_usage",
+    )
+
+
+@pytest.mark.asyncio
+async def test_get_plans(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+    snapshot: SnapshotAssertion,
+) -> None:
+    """Test daily."""
+    await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+
+    await ovoenergy_client.bootstrap_accounts()
+
+    assert await ovoenergy_client.get_plans() == snapshot(
+        name="plans",
+    )
+
+
 # @pytest.mark.asyncio
 # async def test_bootstrap_custom_account(
 #     ovoenergy_client: OVOEnergy,

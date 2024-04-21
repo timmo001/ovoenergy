@@ -82,6 +82,10 @@ RESPONSE_JSON_DAILY_USAGE: Final[dict] = {
             "hasHalfHourData": None,
             "cost": {"amount": "2.56", "currencyUnit": "GBP"},
         },
-
     ],
+}
+
+RESPONSE_JSON_PLANS: Final[dict] = {
+    "electricity": [],
+    "gas": [],
 }

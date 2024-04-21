@@ -14,3 +14,9 @@
 # name: test_get_daily_usage[daily_usage]
   OVODailyUsage(electricity=None, gas=None)
 # ---
+# name: test_get_half_hourly_usage[half_hourly_usage]
+  OVOHalfHourUsage(electricity=None, gas=None)
+# ---
+# name: test_get_plans[plans]
+  OVOPlans(electricity=[], gas=[])
+# ---
