@@ -497,7 +497,9 @@ class OVOEnergy:
                     ],
                 )
                 for json_response in json_response["gas"]
-            ],
+            ]
+            if "gas" in json_response
+            else None,
         )
 
     async def get_footprint(self) -> OVOFootprint:

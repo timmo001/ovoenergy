@@ -72,4 +72,4 @@ class OVOPlans:
     """Plan model."""
 
     electricity: list[OVOPlanElectricity]
-    gas: list[OVOPlanGas]
+    gas: list[OVOPlanGas] | None
