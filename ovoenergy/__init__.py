@@ -125,9 +125,8 @@ class OVOEnergy:
 
         if with_authorization and self.oauth_expired:
             _LOGGER.debug("OAuth token expired, refreshing: %s", self.oauth)
-            await self.get_token()
 
-            if self.oauth is None:
+            if not await self.get_token() or self.oauth is None:
                 raise OVOEnergyAPINotAuthorized("No OAuth token set after refresh")
 
             _LOGGER.debug("OAuth token refreshed: %s", self.oauth)

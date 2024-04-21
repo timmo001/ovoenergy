@@ -1,6 +1,7 @@
 """Main."""
 
 import asyncio
+from dataclasses import asdict
 from datetime import datetime, timedelta
 
 import aiohttp
@@ -37,6 +38,26 @@ async def _setup_client(
     return (client, client_session)
 
 
+@app.command(name="bootstrap", short_help="Bootstrap OVO Energy")
+def bootstrap(
+    username: str = typer.Option(..., help="OVO Energy username"),
+    password: str = typer.Option(..., help="OVO Energy password"),
+) -> None:
+    """Authenticate with OVO Energy."""
+    [client, client_session] = loop.run_until_complete(
+        _setup_client(username, password)
+    )
+
+    bootstrap_accounts = loop.run_until_complete(client.bootstrap_accounts())
+
+    typer.secho(
+        asdict(bootstrap_accounts),
+        fg=typer.colors.GREEN,
+    )
+
+    loop.run_until_complete(client_session.close())
+
+
 @app.command(name="daily", short_help="Get daily usage from OVO Energy")
 def daily(
     username: str = typer.Option(..., help="OVO Energy username"),
@@ -59,7 +80,7 @@ def daily(
     ovo_usage = loop.run_until_complete(client.get_daily_usage(date))
 
     typer.secho(
-        ovo_usage if ovo_usage is not None else '{"message": "No data"}',
+        asdict(ovo_usage) if ovo_usage is not None else '{"message": "No data"}',
         fg=typer.colors.GREEN,
     )
     loop.run_until_complete(client_session.close())
@@ -87,7 +108,7 @@ def half_hourly(
     ovo_usage = loop.run_until_complete(client.get_half_hourly_usage(date))
 
     typer.secho(
-        ovo_usage if ovo_usage is not None else '{"message": "No data"}',
+        asdict(ovo_usage) if ovo_usage is not None else '{"message": "No data"}',
         fg=typer.colors.GREEN,
     )
     loop.run_until_complete(client_session.close())
@@ -109,7 +130,7 @@ def plans(
     ovo_plans = loop.run_until_complete(client.get_plans())
 
     typer.secho(
-        ovo_plans if ovo_plans is not None else '{"message": "No data"}',
+        asdict(ovo_plans) if ovo_plans is not None else '{"message": "No data"}',
         fg=typer.colors.GREEN,
     )
     loop.run_until_complete(client_session.close())
@@ -130,7 +151,9 @@ def carbon_footprint(
     ovo_footprint = loop.run_until_complete(client.get_footprint())
 
     typer.secho(
-        ovo_footprint if ovo_footprint is not None else '{"message": "No data"}',
+        asdict(ovo_footprint)
+        if ovo_footprint is not None
+        else '{"message": "No data"}',
         fg=typer.colors.GREEN,
     )
     loop.run_until_complete(client_session.close())
@@ -151,7 +174,7 @@ def carbon_intensity(
     ovo_carbon_intensity = loop.run_until_complete(client.get_carbon_intensity())
 
     typer.secho(
-        ovo_carbon_intensity
+        asdict(ovo_carbon_intensity)
         if ovo_carbon_intensity is not None
         else '{"message": "No data"}',
         fg=typer.colors.GREEN,
