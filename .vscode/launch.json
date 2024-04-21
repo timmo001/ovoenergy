@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "Module",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "ovoenergy",
       "preLaunchTask": "Module: pip install",
