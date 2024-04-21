@@ -127,35 +127,35 @@ async def test_get_carbon_intensity(
     )
 
 
-# @pytest.mark.asyncio
-# async def test_bootstrap_custom_account(
-#     ovoenergy_client: OVOEnergy,
-#     mock_aioresponse: aioresponses,
-#     snapshot: SnapshotAssertion,
-# ) -> None:
-#     """Test get_daily_usage."""
-#     await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+@pytest.mark.asyncio
+async def test_bootstrap_custom_account(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+    snapshot: SnapshotAssertion,
+) -> None:
+    """Test get_daily_usage."""
+    await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
-#     ovoenergy_client.custom_account_id = ACCOUNT
+    ovoenergy_client.custom_account_id = ACCOUNT
 
-#     await ovoenergy_client.bootstrap_accounts()
+    await ovoenergy_client.bootstrap_accounts()
 
-#     assert await ovoenergy_client.get_daily_usage("2024-01") == snapshot(
-#         name="bootstrap_accounts_custom_account",
-#     )
+    assert await ovoenergy_client.get_daily_usage("2024-01") == snapshot(
+        name="bootstrap_accounts_custom_account",
+    )
 
 
-# @pytest.mark.asyncio
-# async def test_account_bad(
-#     ovoenergy_client: OVOEnergy,
-#     mock_aioresponse: aioresponses,
-#     snapshot: SnapshotAssertion,
-# ) -> None:
-#     """Test get_daily_usage."""
-#     ovoenergy_client.custom_account_id = ACCOUNT_BAD
+@pytest.mark.asyncio
+async def test_account_bad(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """Test get_daily_usage."""
+    await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
-#     with pytest.raises(OVOEnergyNoAccount):
-#         await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+    await ovoenergy_client.bootstrap_accounts()
 
-#     with pytest.raises(OVOEnergyNoAccount):
-#         await ovoenergy_client.bootstrap_accounts()
+    ovoenergy_client.custom_account_id = ACCOUNT_BAD
+
+    with pytest.raises(OVOEnergyNoAccount):
+        await ovoenergy_client.get_daily_usage("2024-01")
