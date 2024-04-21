@@ -208,7 +208,7 @@ class OVOEnergy:
 
         return self._oauth
 
-    async def bootstrap_accounts(self) -> None:
+    async def bootstrap_accounts(self) -> BootstrapAccounts:
         """Bootstrap accounts."""
         response = await self._request(
             "https://smartpaymapi.ovoenergy.com/first-login/api/bootstrap/v2/",
@@ -258,10 +258,12 @@ class OVOEnergy:
             else None,
         )
 
+        return self._bootstrap_accounts
+
     async def get_daily_usage(
         self,
         date: str,
-    ) -> OVODailyUsage | None:
+    ) -> OVODailyUsage:
         """Get daily usage data."""
         if self.account_id is None:
             raise OVOEnergyNoAccount("No account found")
@@ -351,7 +353,7 @@ class OVOEnergy:
     async def get_half_hourly_usage(
         self,
         date: str,
-    ) -> OVOHalfHourUsage | None:
+    ) -> OVOHalfHourUsage:
         """Get half hourly usage data."""
         if self.account_id is None:
             raise OVOEnergyNoAccount("No account found")
