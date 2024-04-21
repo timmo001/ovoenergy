@@ -1,4 +1,4 @@
-aiohttp>=3.7.3
+aiohttp>=3.8.5;python_version<'3.12'
+aiohttp>=3.9.0b0;python_version>='3.12'
 incremental>=22.10.0
-pydantic>=1.10.2
 typer>=0.6.1
