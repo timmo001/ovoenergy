@@ -35,10 +35,10 @@ from .models.footprint import (
 )
 from .models.oauth import OAuth
 from .models.plan import (
-    OVOPlan,
     OVOPlanElectricity,
     OVOPlanGas,
     OVOPlanRate,
+    OVOPlans,
     OVOPlanUnitRate,
 )
 
@@ -124,11 +124,13 @@ class OVOEnergy:
             raise OVOEnergyAPINotAuthorized("No OAuth token set")
 
         if with_authorization and self.oauth_expired:
-            _LOGGER.warning("OAuth token expired, refreshing: %s", self.oauth)
+            _LOGGER.debug("OAuth token expired, refreshing: %s", self.oauth)
             await self.get_token()
 
             if self.oauth is None:
                 raise OVOEnergyAPINotAuthorized("No OAuth token set after refresh")
+
+            _LOGGER.debug("OAuth token refreshed: %s", self.oauth)
 
         response = await self._client_session.request(
             method,
@@ -145,6 +147,9 @@ class OVOEnergy:
         )
         with contextlib.suppress(aiohttp.ClientResponseError):
             response.raise_for_status()
+
+        if with_authorization and response.status in [401, 403]:
+            raise OVOEnergyAPINotAuthorized(f"Not authorized: {response.status}")
 
         return response
 
@@ -405,8 +410,8 @@ class OVOEnergy:
 
         return ovo_usage
 
-    async def get_plan(self) -> OVOPlan:
-        """Get plan."""
+    async def get_plans(self) -> OVOPlans:
+        """Get plans."""
         if self.account_id is None:
             raise OVOEnergyNoAccount("No account found")
 
@@ -416,71 +421,83 @@ class OVOEnergy:
         )
         json_response = await response.json()
 
-        return OVOPlan(
-            electricity=OVOPlanElectricity(
-                name=json_response["electricity"]["name"],
-                exit_fee=OVOPlanRate(
-                    amount=json_response["electricity"]["exitFee"]["amount"],
-                    currency_unit=json_response["electricity"]["exitFee"][
-                        "currencyUnit"
+        return OVOPlans(
+            electricity=[
+                OVOPlanElectricity(
+                    name=json_response["electricity"]["name"],
+                    exit_fee=OVOPlanRate(
+                        amount=json_response["electricity"]["exitFee"]["amount"],
+                        currency_unit=json_response["electricity"]["exitFee"][
+                            "currencyUnit"
+                        ],
+                    ),
+                    contract_start_date=json_response["electricity"][
+                        "contractStartDate"
                     ],
-                ),
-                contract_start_date=json_response["electricity"]["contractStartDate"],
-                contract_end_date=json_response["electricity"]["contractEndDate"],
-                contract_type=json_response["electricity"]["contractType"],
-                is_in_renewal=json_response["electricity"]["isInRenewal"],
-                has_future_contracts=json_response["electricity"]["hasFutureContracts"],
-                mpxn=json_response["electricity"]["mpxn"],
-                msn=json_response["electricity"]["msn"],
-                personal_projection=json_response["electricity"]["personalProjection"],
-                standing_charge=OVOPlanRate(
-                    amount=json_response["electricity"]["standingCharge"]["amount"],
-                    currency_unit=json_response["electricity"]["standingCharge"][
-                        "currencyUnit"
+                    contract_end_date=json_response["electricity"]["contractEndDate"],
+                    contract_type=json_response["electricity"]["contractType"],
+                    is_in_renewal=json_response["electricity"]["isInRenewal"],
+                    has_future_contracts=json_response["electricity"][
+                        "hasFutureContracts"
                     ],
-                ),
-                unit_rates=[
-                    OVOPlanUnitRate(
-                        name=unit_rate["name"],
-                        unit_rate=OVOPlanRate(
-                            amount=unit_rate["unitRate"]["amount"],
-                            currency_unit=unit_rate["unitRate"]["currencyUnit"],
-                        ),
-                    )
-                    for unit_rate in json_response["electricity"]["unitRates"]
-                ],
-            ),
-            gas=OVOPlanGas(
-                name=json_response["gas"]["name"],
-                exit_fee=OVOPlanRate(
-                    amount=json_response["gas"]["exitFee"]["amount"],
-                    currency_unit=json_response["gas"]["exitFee"]["currencyUnit"],
-                ),
-                contract_start_date=json_response["gas"]["contractStartDate"],
-                contract_end_date=json_response["gas"]["contractEndDate"],
-                contract_type=json_response["gas"]["contractType"],
-                is_in_renewal=json_response["gas"]["isInRenewal"],
-                has_future_contracts=json_response["gas"]["hasFutureContracts"],
-                mpxn=json_response["gas"]["mpxn"],
-                msn=json_response["gas"]["msn"],
-                personal_projection=json_response["gas"]["personalProjection"],
-                standing_charge=OVOPlanRate(
-                    amount=json_response["gas"]["standingCharge"]["amount"],
-                    currency_unit=json_response["gas"]["standingCharge"][
-                        "currencyUnit"
+                    mpxn=json_response["electricity"]["mpxn"],
+                    msn=json_response["electricity"]["msn"],
+                    personal_projection=json_response["electricity"][
+                        "personalProjection"
                     ],
-                ),
-                unit_rates=[
-                    OVOPlanUnitRate(
-                        name=unit_rate["name"],
-                        unit_rate=OVOPlanRate(
-                            amount=unit_rate["unitRate"]["amount"],
-                            currency_unit=unit_rate["unitRate"]["currencyUnit"],
-                        ),
-                    )
-                    for unit_rate in json_response["gas"]["unitRates"]
-                ],
-            ),
+                    standing_charge=OVOPlanRate(
+                        amount=json_response["electricity"]["standingCharge"]["amount"],
+                        currency_unit=json_response["electricity"]["standingCharge"][
+                            "currencyUnit"
+                        ],
+                    ),
+                    unit_rates=[
+                        OVOPlanUnitRate(
+                            name=unit_rate["name"],
+                            unit_rate=OVOPlanRate(
+                                amount=unit_rate["unitRate"]["amount"],
+                                currency_unit=unit_rate["unitRate"]["currencyUnit"],
+                            ),
+                        )
+                        for unit_rate in json_response["electricity"]["unitRates"]
+                    ],
+                )
+                for json_response in json_response["electricity"]
+            ],
+            gas=[
+                OVOPlanGas(
+                    name=json_response["gas"]["name"],
+                    exit_fee=OVOPlanRate(
+                        amount=json_response["gas"]["exitFee"]["amount"],
+                        currency_unit=json_response["gas"]["exitFee"]["currencyUnit"],
+                    ),
+                    contract_start_date=json_response["gas"]["contractStartDate"],
+                    contract_end_date=json_response["gas"]["contractEndDate"],
+                    contract_type=json_response["gas"]["contractType"],
+                    is_in_renewal=json_response["gas"]["isInRenewal"],
+                    has_future_contracts=json_response["gas"]["hasFutureContracts"],
+                    mpxn=json_response["gas"]["mpxn"],
+                    msn=json_response["gas"]["msn"],
+                    personal_projection=json_response["gas"]["personalProjection"],
+                    standing_charge=OVOPlanRate(
+                        amount=json_response["gas"]["standingCharge"]["amount"],
+                        currency_unit=json_response["gas"]["standingCharge"][
+                            "currencyUnit"
+                        ],
+                    ),
+                    unit_rates=[
+                        OVOPlanUnitRate(
+                            name=unit_rate["name"],
+                            unit_rate=OVOPlanRate(
+                                amount=unit_rate["unitRate"]["amount"],
+                                currency_unit=unit_rate["unitRate"]["currencyUnit"],
+                            ),
+                        )
+                        for unit_rate in json_response["gas"]["unitRates"]
+                    ],
+                )
+                for json_response in json_response["gas"]
+            ],
         )
 
     async def get_footprint(self) -> OVOFootprint:

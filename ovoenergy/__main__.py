@@ -8,10 +8,6 @@ import typer
 
 from . import OVOEnergy
 from ._version import __version__
-from .models import OVODailyUsage, OVOHalfHourUsage
-from .models.carbon_intensity import OVOCarbonIntensity
-from .models.footprint import OVOFootprint
-from .models.plan import OVOPlan
 
 app = typer.Typer()
 loop = asyncio.new_event_loop()
@@ -57,8 +53,6 @@ def daily(
         # Get this month
         date = datetime.now().strftime("%Y-%m")
 
-    ovo_usage: OVODailyUsage | None = None
-
     [client, client_session] = loop.run_until_complete(
         _setup_client(username, password, account)
     )
@@ -87,8 +81,6 @@ def half_hourly(
         # Get yesterday's date
         date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
-    ovo_usage: OVOHalfHourUsage | None = None
-
     [client, client_session] = loop.run_until_complete(
         _setup_client(username, password, account)
     )
@@ -101,8 +93,8 @@ def half_hourly(
     loop.run_until_complete(client_session.close())
 
 
-@app.command(name="plan", short_help="Get plan from OVO Energy")
-def plan(
+@app.command(name="plans", short_help="Get plans from OVO Energy")
+def plans(
     username: str = typer.Option(..., help="OVO Energy username"),
     password: str = typer.Option(..., help="OVO Energy password"),
     account: int = typer.Option(
@@ -110,15 +102,14 @@ def plan(
     ),
 ) -> None:
     """Get rates from OVO Energy."""
-    ovo_plan: OVOPlan | None = None
-
     [client, client_session] = loop.run_until_complete(
         _setup_client(username, password, account)
     )
-    ovo_plan = loop.run_until_complete(client.get_plan())
+
+    ovo_plans = loop.run_until_complete(client.get_plans())
 
     typer.secho(
-        ovo_plan if ovo_plan is not None else '{"message": "No data"}',
+        ovo_plans if ovo_plans is not None else '{"message": "No data"}',
         fg=typer.colors.GREEN,
     )
     loop.run_until_complete(client_session.close())
@@ -133,8 +124,6 @@ def carbon_footprint(
     ),
 ) -> None:
     """Get carbon footprint from OVO Energy."""
-    ovo_footprint: OVOFootprint | None = None
-
     [client, client_session] = loop.run_until_complete(
         _setup_client(username, password, account)
     )
@@ -156,8 +145,6 @@ def carbon_intensity(
     ),
 ) -> None:
     """Get carbon intensity from OVO Energy."""
-    ovo_carbon_intensity: OVOCarbonIntensity | None = None
-
     [client, client_session] = loop.run_until_complete(
         _setup_client(username, password, account)
     )

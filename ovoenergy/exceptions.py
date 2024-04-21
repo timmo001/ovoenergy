@@ -12,11 +12,11 @@ class OVOEnergyNoAccount(OVOEnergyException):
 
 # API Exceptions
 class OVOEnergyAPIException(OVOEnergyException):
-    """Exception for OVO Energy API."""
+    """Exception for API exceptions."""
 
 
 class OVOEnergyAPINotAuthorized(OVOEnergyAPIException):
-    """Exception for API not authorized."""
+    """Exception for API client not authorized."""
 
 
 class OVOEnergyAPINoCookies(OVOEnergyAPIException):

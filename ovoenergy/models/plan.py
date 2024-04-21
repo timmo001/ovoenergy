@@ -68,8 +68,8 @@ class OVOPlanGas:
 
 
 @dataclass
-class OVOPlan:
+class OVOPlans:
     """Plan model."""
 
-    electricity: OVOPlanElectricity
-    gas: OVOPlanGas
+    electricity: list[OVOPlanElectricity]
+    gas: list[OVOPlanGas]
