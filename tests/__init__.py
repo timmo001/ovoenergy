@@ -89,3 +89,40 @@ RESPONSE_JSON_PLANS: Final[dict] = {
     "electricity": [],
     "gas": [],
 }
+
+RESPONSE_JSON_FOOTPRINT: Final[dict] = {
+    "from": "2024-01-01T00:00:00Z",
+    "to": "2024-01-01T23:59:59.999000Z",
+    "carbonReductionProductIds": [],
+    "carbonFootprint": {
+        "carbonKg": 2200.1234,
+        "carbonSavedKg": 0.0,
+        "kWh": 1578.3246,
+        "breakdown": {
+            "electricity": {
+                "carbonKg": 200.1234,
+                "carbonSavedKg": 230.02,
+                "kWh": 65645.92,
+            },
+            "gas": {
+                "carbonKg": 2000.1234,
+                "carbonSavedKg": 340.02,
+                "kWh": 10664.74363579,
+            },
+        },
+    },
+}
+
+RESPONSE_JSON_INTENSITY: Final[dict] = {
+    "forecast": [
+        {
+            "from": "2pm",
+            "intensity": 82,
+            "level": "low",
+            "colour": "#0A9928",
+            "colourV2": "#0D8426",
+        },
+    ],
+    "current": "low",
+    "greentime": None,
+}

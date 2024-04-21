@@ -55,7 +55,7 @@ async def test_get_daily_usage(
     mock_aioresponse: aioresponses,
     snapshot: SnapshotAssertion,
 ) -> None:
-    """Test daily."""
+    """Test get daily usage."""
     await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
     await ovoenergy_client.bootstrap_accounts()
@@ -71,7 +71,7 @@ async def test_get_half_hourly_usage(
     mock_aioresponse: aioresponses,
     snapshot: SnapshotAssertion,
 ) -> None:
-    """Test daily."""
+    """Test get half hourly usage."""
     await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
     await ovoenergy_client.bootstrap_accounts()
@@ -87,13 +87,43 @@ async def test_get_plans(
     mock_aioresponse: aioresponses,
     snapshot: SnapshotAssertion,
 ) -> None:
-    """Test daily."""
+    """Test get plans."""
     await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
     await ovoenergy_client.bootstrap_accounts()
 
     assert await ovoenergy_client.get_plans() == snapshot(
         name="plans",
+    )
+
+
+@pytest.mark.asyncio
+async def test_get_footprint(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+    snapshot: SnapshotAssertion,
+) -> None:
+    """Test get footprint."""
+    await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+
+    await ovoenergy_client.bootstrap_accounts()
+
+    assert await ovoenergy_client.get_footprint() == snapshot(
+        name="footprint",
+    )
+
+
+@pytest.mark.asyncio
+async def test_get_carbon_intensity(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+    snapshot: SnapshotAssertion,
+) -> None:
+    """Test get carbon intensity."""
+    await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+
+    assert await ovoenergy_client.get_carbon_intensity() == snapshot(
+        name="carbon_intensity",
     )
 
 
