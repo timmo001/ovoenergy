@@ -1,26 +1,24 @@
-"""OVO Energy: Footprint Models."""
-from __future__ import annotations
+"""Footprint Models."""
 
-from typing import Any, Optional
-
-from pydantic import Field
-
-from . import OVOBase
+from dataclasses import dataclass
+from typing import Any
 
 
-class OVOCarbonIntensityForecast(OVOBase):
+@dataclass
+class OVOCarbonIntensityForecast:
     """Carbon intensity forecast model."""
 
-    time_from: str = Field(None, alias="from")
-    intensity: float = Field(None, alias="intensity")
-    level: str = Field(None, alias="level")
-    colour: str = Field(None, alias="color")
-    colour_v2: str = Field(None, alias="colourV2")
+    time_from: str
+    intensity: float
+    level: str
+    colour: str
+    colour_v2: str
 
 
-class OVOCarbonIntensity(OVOBase):
+@dataclass
+class OVOCarbonIntensity:
     """Carbon intensity model."""
 
-    forecast: list[OVOCarbonIntensityForecast] = Field([], alias="forecast")
-    current: Optional[str] = Field(None, alias="current")
-    greentime: Optional[Any] = Field(None, alias="greentime")
+    forecast: list[OVOCarbonIntensityForecast]
+    current: str | None
+    greentime: Any | None

@@ -1,88 +1,85 @@
-"""OVO Energy: Models."""
-from __future__ import annotations
+"""Models."""
 
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
-
-from pydantic import BaseModel, Extra, Field  # pylint: disable=no-name-in-module
 
 
-class OVOBase(BaseModel):
-    """Base class for all OVO models."""
-
-    class Config:
-        """Pydantic config."""
-
-        extra = Extra.allow
-
-
-class OVOInterval(OVOBase):
+@dataclass
+class OVOInterval:
     """Interval model."""
 
-    start: datetime = Field(None, alias="start")
-    end: datetime = Field(None, alias="end")
+    start: datetime
+    end: datetime
 
 
-class OVOMeterReadings(OVOBase):
+@dataclass
+class OVOMeterReadings:
     """Meter readings model."""
 
-    start: float = Field(None, alias="start")
-    end: float = Field(None, alias="end")
+    start: float
+    end: float
 
 
-class OVOCost(OVOBase):
+@dataclass
+class OVOCost:
     """Cost model."""
 
-    amount: Optional[float] = Field(None, alias="amount")
-    currency_unit: Optional[str] = Field(None, alias="currencyUnit")
+    amount: float | None
+    currency_unit: str | None
 
 
-class OVODailyElectricity(OVOBase):
+@dataclass
+class OVODailyElectricity:
     """Daily electricity model."""
 
-    consumption: Optional[float] = Field(None, alias="consumption")
-    interval: Optional[OVOInterval] = Field(None, alias="interval")
-    meter_readings: Optional[OVOMeterReadings] = Field(None, alias="meterReadings")
-    has_half_hour_data: Optional[bool] = Field(None, alias="hasHalfHourData")
-    cost: Optional[OVOCost] = Field(None, alias="cost")
+    consumption: float | None
+    interval: OVOInterval | None
+    meter_readings: OVOMeterReadings | None
+    has_half_hour_data: bool | None
+    cost: OVOCost | None
 
 
-class OVODailyGas(OVOBase):
+@dataclass
+class OVODailyGas:
     """Daily gas model."""
 
-    consumption: Optional[float] = Field(None, alias="consumption")
-    volume: Optional[float] = Field(None, alias="volume")
-    interval: Optional[OVOInterval] = Field(None, alias="interval")
-    meter_readings: Optional[OVOMeterReadings] = Field(None, alias="meterReadings")
-    has_half_hour_data: Optional[bool] = Field(None, alias="hasHalfHourData")
-    cost: Optional[OVOCost] = Field(None, alias="cost")
+    consumption: float | None
+    volume: float | None
+    interval: OVOInterval | None
+    meter_readings: OVOMeterReadings | None
+    has_half_hour_data: bool | None
+    cost: OVOCost | None
 
 
-class OVOHalfHour(OVOBase):
+@dataclass
+class OVOHalfHour:
     """Half hour model."""
 
-    consumption: float = Field(None, alias="consumption")
-    interval: OVOInterval = Field(None, alias="interval")
-    unit: str = Field(None, alias="unit")
+    consumption: float
+    interval: OVOInterval
+    unit: str
 
 
-class OVODailyUsage(OVOBase):
+@dataclass
+class OVODailyUsage:
     """Daily usage model."""
 
-    electricity: list[OVODailyElectricity] = Field([], alias="electricity")
-    gas: list[OVODailyGas] = Field([], alias="gas")
+    electricity: list[OVODailyElectricity] | None
+    gas: list[OVODailyGas] | None
 
 
-class OVOHalfHourUsage(OVOBase):
+@dataclass
+class OVOHalfHourUsage:
     """Half hour usage model."""
 
-    electricity: list[OVOHalfHour] = Field([], alias="electricity")
-    gas: list[OVOHalfHour] = Field([], alias="gas")
+    electricity: list[OVOHalfHour] | None
+    gas: list[OVOHalfHour] | None
 
 
-class OVOPlan(OVOBase):
+@dataclass
+class OVOPlan:
     """Plan model."""
 
-    standing_charge: Optional[float] = Field(None, alias="standingCharge")
-    unit_rate: Optional[float] = Field(None, alias="unitRate")
-    tariff: Optional[str] = Field(None, alias="tariff")
+    standing_charge: float | None
+    unit_rate: float | None
+    tariff: str | None

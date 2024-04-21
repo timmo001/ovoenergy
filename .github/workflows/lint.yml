@@ -1,5 +1,5 @@
 ---
-name: Lint
+name: "Lint"
 
 # yamllint disable-line rule:truthy
 on:
@@ -18,8 +18,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-black-module:
-    uses: timmo001/workflows/.github/workflows/lint-black.yml@master
   lint-jsonlint:
     uses: timmo001/workflows/.github/workflows/lint-jsonlint.yml@master
   lint-markdown-links:
@@ -28,9 +26,13 @@ jobs:
     uses: timmo001/workflows/.github/workflows/lint-markdownlint.yml@master
   lint-prettier:
     uses: timmo001/workflows/.github/workflows/lint-prettier.yml@master
-  lint-pylint-module:
+    with:
+      file-types: "{json,yml,yaml}"
+  lint-pylint:
     uses: timmo001/workflows/.github/workflows/lint-pylint.yml@master
     with:
       module-name: ovoenergy
+  lint-ruff:
+    uses: timmo001/workflows/.github/workflows/lint-ruff.yml@master
   lint-yamllint:
     uses: timmo001/workflows/.github/workflows/lint-yamllint.yml@master

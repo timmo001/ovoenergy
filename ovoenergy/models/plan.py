@@ -1,73 +1,75 @@
-"""OVO Energy: Plan Models."""
-from __future__ import annotations
+"""Plan Models."""
 
+from dataclasses import dataclass
 from typing import Any
 
-from pydantic import Field
 
-from . import OVOBase
-
-
-class OVOPlanRate(OVOBase):
+@dataclass
+class OVOPlanRate:
     """Plan rate model."""
 
-    amount: float = Field(None, alias="amount")
-    currency_unit: str = Field(None, alias="currencyUnit")
+    amount: float
+    currency_unit: str
 
 
-class OVOPlanStatus(OVOBase):
+@dataclass
+class OVOPlanStatus:
     """Plan status model."""
 
     active: bool
-    in_renewal: bool = Field(None, alias="inRenewal")
-    in_loss: bool = Field(None, alias="inLoss")
-    loss_complete: bool = Field(None, alias="lossComplete")
-    has_future_contracts: bool = Field(None, alias="hasFutureContracts")
+    in_renewal: bool
+    in_loss: bool
+    loss_complete: bool
+    has_future_contracts: bool
 
 
-class OVOPlanUnitRate(OVOBase):
+@dataclass
+class OVOPlanUnitRate:
     """Unit rate model."""
 
-    name: str = Field(None, alias="name")
-    unit_rate: OVOPlanRate = Field(None, alias="unitRate")
+    name: str
+    unit_rate: OVOPlanRate
 
 
-class OVOPlanElectricity(OVOBase):
+@dataclass
+class OVOPlanElectricity:
     """Plan electricity model."""
 
-    name: str = Field(None, alias="name")
-    exit_fee: OVOPlanRate = Field(None, alias="exitFee")
-    contract_start_date: str = Field(None, alias="contractStartDate")
-    contract_end_date: Any = Field(None, alias="contractEndDate")
-    contract_type: str = Field(None, alias="contractType")
-    is_in_renewal: bool = Field(None, alias="isInRenewal")
-    has_future_contracts: bool = Field(None, alias="hasFutureContracts")
-    mpxn: str = Field(None, alias="mpxn")
-    msn: str = Field(None, alias="msn")
-    personal_projection: float = Field(None, alias="personalProjection")
-    standing_charge: OVOPlanRate = Field(None, alias="standingCharge")
-    unit_rates: list[OVOPlanUnitRate] = Field(None, alias="unitRates")
+    name: str
+    exit_fee: OVOPlanRate
+    contract_start_date: str
+    contract_end_date: Any
+    contract_type: str
+    is_in_renewal: bool
+    has_future_contracts: bool
+    mpxn: str
+    msn: str
+    personal_projection: float
+    standing_charge: OVOPlanRate
+    unit_rates: list[OVOPlanUnitRate]
 
 
-class OVOPlanGas(OVOBase):
+@dataclass
+class OVOPlanGas:
     """Plan gas model."""
 
-    name: str = Field(None, alias="name")
-    exit_fee: OVOPlanRate = Field(None, alias="exitFee")
-    contract_start_date: str = Field(None, alias="contractStartDate")
-    contract_end_date: Any = Field(None, alias="contractEndDate")
-    contract_type: str = Field(None, alias="contractType")
-    is_in_renewal: bool = Field(None, alias="isInRenewal")
-    has_future_contracts: bool = Field(None, alias="hasFutureContracts")
-    mpxn: str = Field(None, alias="mpxn")
-    msn: str = Field(None, alias="msn")
-    personal_projection: float = Field(None, alias="personalProjection")
-    standing_charge: OVOPlanRate = Field(None, alias="standingCharge")
-    unit_rates: list[OVOPlanUnitRate] = Field(None, alias="unitRates")
+    name: str
+    exit_fee: OVOPlanRate
+    contract_start_date: str
+    contract_end_date: Any
+    contract_type: str
+    is_in_renewal: bool
+    has_future_contracts: bool
+    mpxn: str
+    msn: str
+    personal_projection: float
+    standing_charge: OVOPlanRate
+    unit_rates: list[OVOPlanUnitRate]
 
 
-class OVOPlan(OVOBase):
+@dataclass
+class OVOPlans:
     """Plan model."""
 
-    electricity: OVOPlanElectricity = Field(None, alias="electricity")
-    gas: OVOPlanGas = Field(None, alias="gas")
+    electricity: list[OVOPlanElectricity]
+    gas: list[OVOPlanGas]
