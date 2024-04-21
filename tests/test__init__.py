@@ -13,7 +13,7 @@ from ovoenergy.exceptions import (
     OVOEnergyNoAccount,
 )
 
-from . import ACCOUNT, ACCOUNT_BAD, PASSWORD, USERNAME
+from . import ACCOUNT, ACCOUNT_BAD, PASSWORD, RESPONSE_JSON_AUTH, USERNAME
 
 
 @pytest.mark.asyncio
@@ -196,6 +196,7 @@ async def test_no_cookies(
 
 
 # pylint: disable=protected-access
+@pytest.mark.asyncio
 async def test_no_auth(
     ovoenergy_client: OVOEnergy,
     mock_aioresponse: aioresponses,
@@ -212,6 +213,7 @@ async def test_no_auth(
 
 
 # pylint: disable=protected-access
+@pytest.mark.asyncio
 async def test_oauth_expired(
     ovoenergy_client: OVOEnergy,
     mock_aioresponse: aioresponses,
@@ -242,6 +244,7 @@ async def test_oauth_expired(
         await ovoenergy_client.get_daily_usage("2024-01")
 
 
+@pytest.mark.asyncio
 async def test_forbidden(
     ovoenergy_client: OVOEnergy,
     mock_aioresponse: aioresponses,
@@ -260,3 +263,74 @@ async def test_forbidden(
 
     with pytest.raises(OVOEnergyAPINotAuthorized):
         await ovoenergy_client.get_daily_usage("2024-01")
+
+
+@pytest.mark.asyncio
+async def test_auth_not_found(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """Test auth endpoint not found."""
+    mock_aioresponse.clear()
+    mock_aioresponse.post(
+        "https://my.ovoenergy.com/api/v2/auth/login",
+        status=404,
+        repeat=True,
+    )
+
+    assert not await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+
+
+@pytest.mark.asyncio
+async def test_auth_code_not_found(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """Test auth endpoint code not found."""
+    mock_aioresponse.clear()
+    mock_aioresponse.post(
+        "https://my.ovoenergy.com/api/v2/auth/login",
+        status=204,
+        repeat=True,
+    )
+
+    assert not await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+
+
+@pytest.mark.asyncio
+async def test_auth_code_unknown(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """Test auth token not found."""
+    mock_aioresponse.clear()
+    mock_aioresponse.post(
+        "https://my.ovoenergy.com/api/v2/auth/login",
+        status=200,
+        payload={"code": "Unknown"},
+        repeat=True,
+    )
+
+    assert not await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+
+
+@pytest.mark.asyncio
+async def test_auth_token_not_found(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """Test auth token not found."""
+    mock_aioresponse.clear()
+    mock_aioresponse.post(
+        "https://my.ovoenergy.com/api/v2/auth/login",
+        payload=RESPONSE_JSON_AUTH,
+        status=200,
+        repeat=True,
+    )
+    mock_aioresponse.get(
+        "https://my.ovoenergy.com/api/v2/auth/token",
+        status=404,
+        repeat=True,
+    )
+
+    assert not await ovoenergy_client.authenticate(USERNAME, PASSWORD)
