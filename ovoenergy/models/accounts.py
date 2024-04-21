@@ -42,6 +42,6 @@ class BootstrapAccounts:
 
     account_ids: list[int]
     customer_id: UUID
+    selected_account_id: int
     accounts: list[Account] | None
     is_first_login: bool | None
-    selected_account_id: int | None
