@@ -240,3 +240,23 @@ async def test_oauth_expired(
 
     with pytest.raises(OVOEnergyAPINotAuthorized):
         await ovoenergy_client.get_daily_usage("2024-01")
+
+
+async def test_forbidden(
+    ovoenergy_client: OVOEnergy,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """Test forbidden."""
+    await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+
+    await ovoenergy_client.bootstrap_accounts()
+
+    mock_aioresponse.clear()
+    mock_aioresponse.get(
+        f"https://smartpaymapi.ovoenergy.com/usage/api/daily/{ACCOUNT}?date=2024-01",
+        status=403,
+        repeat=True,
+    )
+
+    with pytest.raises(OVOEnergyAPINotAuthorized):
+        await ovoenergy_client.get_daily_usage("2024-01")
