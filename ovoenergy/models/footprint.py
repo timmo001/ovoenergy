@@ -1,53 +1,50 @@
-"""OVO Energy: Footprint Models."""
-from __future__ import annotations
+"""Footprint Models."""
 
-from typing import Any, Optional
-
-from pydantic import Field
-
-from . import OVOBase
+from dataclasses import dataclass
+from typing import Any
 
 
-class OVOFootprintElectricity(OVOBase):
+@dataclass
+class OVOFootprintElectricity:
     """Electricity footprint model."""
 
-    carbon_kg: float = Field(None, alias="carbonKg")
-    carbon_saved_kg: float = Field(None, alias="carbonSavedKg")
-    k_wh: float = Field(None, alias="kWh")
+    carbon_kg: float
+    carbon_saved_kg: float
+    k_wh: float
 
 
-class OVOFootprintGas(OVOBase):
+@dataclass
+class OVOFootprintGas:
     """Gas footprint model."""
 
-    carbon_kg: float = Field(None, alias="carbonKg")
-    carbon_saved_kg: float = Field(None, alias="carbonSavedKg")
-    k_wh: float = Field(None, alias="kWh")
+    carbon_kg: float
+    carbon_saved_kg: float
+    k_wh: float
 
 
-class OVOFootprintBreakdown(OVOBase):
+@dataclass
+class OVOFootprintBreakdown:
     """Footprint breakdown model."""
 
-    electricity: OVOFootprintElectricity = Field(None, alias="electricity")
-    gas: OVOFootprintGas = Field(None, alias="gas")
+    electricity: OVOFootprintElectricity
+    gas: OVOFootprintGas
 
 
-class OVOCarbonFootprint(OVOBase):
+@dataclass
+class OVOCarbonFootprint:
     """Carbon footprint model."""
 
-    carbon_kg: float = Field(None, alias="carbonKg")
-    carbon_saved_kg: float = Field(None, alias="carbonSavedKg")
-    k_wh: float = Field(None, alias="kWh")
-    breakdown: OVOFootprintBreakdown = Field(None, alias="breakdown")
+    carbon_kg: float
+    carbon_saved_kg: float
+    k_wh: float
+    breakdown: OVOFootprintBreakdown
 
 
-class OVOFootprint(OVOBase):
+@dataclass
+class OVOFootprint:
     """Footprint model."""
 
-    from_: Optional[str] = Field(None, alias="from")
-    to: Optional[str] = Field(None, alias="to")
-    carbon_reduction_product_ids: list[Any] = Field(
-        None, alias="carbonReductionProductIds"
-    )
-    carbon_footprint: Optional[OVOCarbonFootprint] = Field(
-        None, alias="carbonFootprint"
-    )
+    from_: str | None
+    to: str | None
+    carbon_reduction_product_ids: list[Any]
+    carbon_footprint: OVOCarbonFootprint | None
