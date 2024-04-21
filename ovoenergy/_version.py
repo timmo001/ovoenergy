@@ -7,5 +7,5 @@ Provides ovoenergy version information.
 
 from incremental import Version
 
-__version__ = Version("ovoenergy", 1, 3, 1)
+__version__ = Version("ovoenergy", 2, 0, 0, dev=0)
 __all__ = ["__version__"]
