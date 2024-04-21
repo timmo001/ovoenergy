@@ -73,6 +73,9 @@ async def test_get_daily_usage(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test get daily usage."""
+    with pytest.raises(OVOEnergyNoAccount):
+        await ovoenergy_client.get_daily_usage("2024-01")
+
     await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
     await ovoenergy_client.bootstrap_accounts()
@@ -89,6 +92,9 @@ async def test_get_half_hourly_usage(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test get half hourly usage."""
+    with pytest.raises(OVOEnergyNoAccount):
+        await ovoenergy_client.get_half_hourly_usage("2024-01-01")
+
     await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
     await ovoenergy_client.bootstrap_accounts()
@@ -105,6 +111,9 @@ async def test_get_plans(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test get plans."""
+    with pytest.raises(OVOEnergyNoAccount):
+        await ovoenergy_client.get_plans()
+
     await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
     await ovoenergy_client.bootstrap_accounts()
@@ -121,6 +130,9 @@ async def test_get_footprint(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test get footprint."""
+    with pytest.raises(OVOEnergyNoAccount):
+        await ovoenergy_client.get_footprint()
+
     await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
     await ovoenergy_client.bootstrap_accounts()
