@@ -1,5 +1,5 @@
 ---
-name: "Build"
+name: "Test"
 
 # yamllint disable-line rule:truthy
 on:
@@ -18,5 +18,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    uses: timmo001/workflows/.github/workflows/build-python-linux.yml@master
+  test:
+    uses: timmo001/workflows/.github/workflows/test-pytest.yml@master
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    with:
+      module-name: "ovoenergy"

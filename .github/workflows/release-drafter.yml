@@ -1,16 +1,11 @@
 ---
-name: Release Drafter
+name: "Release Drafter"
 
 # yamllint disable-line rule:truthy
 on:
   push:
     branches:
       - master
-  pull_request_target:
-    types:
-      - opened
-      - reopened
-      - synchronize
   workflow_dispatch:
 
 jobs:
