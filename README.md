@@ -4,8 +4,6 @@
 ![Project Stage][project-stage-shield]
 [![License][license-shield]](LICENSE)
 
-[![Buy me a coffee][buymeacoffee-shield]][buymeacoffee]
-
 Get energy data from OVO's API.
 
 ## Links
