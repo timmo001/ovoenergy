@@ -29,6 +29,14 @@ class OVOCost:
 
 
 @dataclass
+class OVORates:
+    """Rates model."""
+
+    anytime: float | None
+    standing: float | None
+
+
+@dataclass
 class OVODailyElectricity:
     """Daily electricity model."""
 
@@ -37,6 +45,7 @@ class OVODailyElectricity:
     meter_readings: OVOMeterReadings | None
     has_half_hour_data: bool | None
     cost: OVOCost | None
+    rates: OVORates | None
 
 
 @dataclass
@@ -49,6 +58,7 @@ class OVODailyGas:
     meter_readings: OVOMeterReadings | None
     has_half_hour_data: bool | None
     cost: OVOCost | None
+    rates: OVORates | None
 
 
 @dataclass
