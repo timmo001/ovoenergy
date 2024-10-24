@@ -19,7 +19,7 @@ jobs:
       id-token: write
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.2
         with:
           ref: "master"
           token: ${{ secrets.PUSH_TOKEN }}
