@@ -14,6 +14,7 @@ class OVOEnergyNoAccount(OVOEnergyException):
 class OVOEnergyAPIException(OVOEnergyException):
     """Exception for API exceptions."""
 
+
 class OVOEnergyAPIInvalidResponse(OVOEnergyAPIException):
     """Exception for invalid response."""
 
