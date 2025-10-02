@@ -23,6 +23,7 @@ from .models import (
     OVOHalfHourUsage,
     OVOInterval,
     OVOMeterReadings,
+    OVORates,
 )
 from .models.accounts import Account, BootstrapAccounts, Supply, SupplyPointInfo
 from .models.carbon_intensity import OVOCarbonIntensity, OVOCarbonIntensityForecast
@@ -310,6 +311,10 @@ class OVOEnergy:
                                 )
                                 if "cost" in usage
                                 else None,
+                                rates=OVORates(
+                                    anytime=usage["rates"]["anytime"],
+                                    standing=usage["rates"]["standing"],
+                                )
                             )
                         )
 
@@ -344,6 +349,10 @@ class OVOEnergy:
                                     amount=usage["cost"]["amount"],
                                     currency_unit=usage["cost"]["currencyUnit"],
                                 ),
+                                rates=OVORates(
+                                    anytime=usage["rates"]["anytime"],
+                                    standing=usage["rates"]["standing"],
+                                )
                             )
                         )
 
