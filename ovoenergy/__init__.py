@@ -450,9 +450,11 @@ class OVOEnergy:
                                     else None
                                 ),
                                 rates=OVORates(
-                                    anytime=usage["rates"]["anytime"],
-                                    standing=usage["rates"]["standing"],
-                                ),
+                                    anytime=usage["rates"].get("anytime", None),
+                                    standing=usage["rates"].get("standing", None),
+                                )
+                                if "rates" in usage
+                                else None,
                             )
                         )
 
@@ -490,11 +492,15 @@ class OVOEnergy:
                                 cost=OVOCost(
                                     amount=usage["cost"]["amount"],
                                     currency_unit=usage["cost"]["currencyUnit"],
-                                ),
+                                )
+                                if "cost" in usage
+                                else None,
                                 rates=OVORates(
-                                    anytime=usage["rates"]["anytime"],
-                                    standing=usage["rates"]["standing"],
-                                ),
+                                    anytime=usage["rates"].get("anytime", None),
+                                    standing=usage["rates"].get("standing", None),
+                                )
+                                if "rates" in usage
+                                else None,
                             )
                         )
 
