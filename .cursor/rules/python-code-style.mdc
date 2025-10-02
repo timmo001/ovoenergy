@@ -1,0 +1,55 @@
+---
+globs: *.py
+description: Python code style and best practices
+---
+
+# Python Code Style Guidelines
+
+## Async/Await Patterns
+
+- Use `async def` for all API methods
+- Use `aiohttp.ClientSession` for HTTP requests
+- Always close client sessions properly with `await session.close()`
+- Use `asyncio.run_until_complete()` in CLI functions
+
+## Error Handling
+
+- Use custom exceptions from [ovoenergy/exceptions.py](mdc:ovoenergy/exceptions.py)
+- Raise `OVOEnergyNoAccount` when no account is found
+- Raise `OVOEnergyAPINotAuthorized` for authentication issues
+- Raise `OVOEnergyAPINoCookies` when cookies are missing
+
+## Data Models
+
+- Use dataclasses for API response models
+- Include proper type hints for all parameters
+- Use `| None` for optional fields instead of `Optional[T]`
+- Use `Literal` types for string constants
+
+## API Client Patterns
+
+- Store authentication state in instance variables (`_oauth`, `_cookies`)
+- Use property methods for computed values (`account_id`, `oauth_expired`)
+- Implement proper token refresh logic
+- Use context managers where appropriate
+
+## CLI Interface
+
+- Use Typer for command-line interface
+- Provide helpful option descriptions
+- Use `typer.secho()` for colored output
+- Handle authentication failures gracefully
+
+## Testing Patterns
+
+- Use `aioresponses` for mocking HTTP requests
+- Use `pytest-asyncio` for async test functions
+- Use `syrupy` for snapshot testing
+- Mock all external API calls in tests
+
+## Code Organization
+
+- Group related functionality in the same class
+- Use private methods (prefixed with `_`) for internal logic
+- Keep public API methods simple and focused
+- Document complex business logic with comments

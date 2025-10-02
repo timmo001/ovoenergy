@@ -1,0 +1,46 @@
+---
+alwaysApply: true
+description: Linting and code quality rules for the OVO Energy project
+---
+
+# Linting and Code Quality Rules
+
+## Linting Tools
+
+This project uses **Ruff** for all linting, formatting, and import sorting. Do not use Black or isort separately.
+
+### Ruff Configuration
+
+- Configuration is in [pyproject.toml](mdc:pyproject.toml) under `[tool.ruff.lint]`
+- Ruff handles: linting, formatting, and import sorting
+- Run `python -m ruff check .` to check for issues
+- Run `python -m ruff check --fix .` to auto-fix issues
+- Run `python -m ruff format .` to format code
+
+### Pylint Configuration
+
+- Additional code analysis with [pyproject.toml](mdc:pyproject.toml) under `[tool.pylint.MAIN]`
+- Run `python -m pylint ovoenergy/` to check the main package
+- Ignores tests directory by default
+
+## Code Style Guidelines
+
+- Follow the Ruff configuration rules in [pyproject.toml](mdc:pyproject.toml)
+- Use single quotes for strings (Q000 rule)
+- Maximum line length: 88 characters (handled by Ruff)
+- Import sorting: handled automatically by Ruff
+- No hardcoded version numbers in code
+
+## Before Committing
+
+Always run:
+
+```bash
+python -m ruff check . && python -m ruff format . && python -m pylint ovoenergy/
+```
+
+## Version Management
+
+- Version is defined in [setup.py](mdc:setup.py) only
+- No `__version__` variable in [ovoenergy/**init**.py](mdc:ovoenergy/__init__.py)
+- No version CLI commands in [ovoenergy/**main**.py](mdc:ovoenergy/__main__.py)

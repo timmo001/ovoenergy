@@ -1,0 +1,60 @@
+---
+globs: tests/*.py,test_*.py
+description: Testing guidelines and patterns
+---
+
+# Testing Guidelines
+
+## Test Structure
+
+- All tests in [tests/](mdc:tests/) directory
+- Use descriptive test function names: `test_<functionality>_<scenario>`
+- Group related tests in the same file
+- Use fixtures from [tests/conftest.py](mdc:tests/conftest.py)
+
+## Async Testing
+
+- Use `@pytest.mark.asyncio` for async test functions
+- Use `async def` for test functions that test async code
+- Use `await` when calling async methods in tests
+
+## Mocking HTTP Requests
+
+- Use `aioresponses` to mock all HTTP requests
+- Mock all external API endpoints in [tests/conftest.py](mdc:tests/conftest.py)
+- Use `mock_aioresponse` fixture for individual test mocking
+- Always mock both successful and error responses
+
+## Snapshot Testing
+
+- Use `syrupy` for snapshot testing of complex data structures
+- Store snapshots in [tests/**snapshots**/](mdc:tests/__snapshots__/)
+- Use descriptive snapshot names: `snapshot(name="descriptive_name")`
+- Test both success and error scenarios
+
+## Test Data
+
+- Use constants for test data (USERNAME, PASSWORD, ACCOUNT)
+- Store mock response data in [tests/**init**.py](mdc:tests/__init__.py)
+- Use realistic test data that matches actual API responses
+
+## Error Testing
+
+- Test all exception scenarios
+- Use `pytest.raises()` for expected exceptions
+- Test both authentication and authorization failures
+- Test network error scenarios
+
+## Fixtures
+
+- Use `ovoenergy_client` fixture for clean client instances
+- Use `mock_aioresponse` fixture for HTTP mocking
+- Use `snapshot` fixture for snapshot testing
+- Keep fixtures focused and reusable
+
+## Test Coverage
+
+- Aim for high test coverage of the main API client
+- Test both happy path and error scenarios
+- Test edge cases and boundary conditions
+- Use `pytest-cov` to measure coverage

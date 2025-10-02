@@ -1,0 +1,43 @@
+---
+alwaysApply: true
+description: Project structure and architecture guidelines
+---
+
+# Project Structure Guide
+
+## Main Package Structure
+
+- **Entry point**: [ovoenergy/**init**.py](mdc:ovoenergy/__init__.py) - Main OVOEnergy class and API
+- **CLI interface**: [ovoenergy/**main**.py](mdc:ovoenergy/__main__.py) - Command-line interface using Typer
+- **Models**: [ovoenergy/models/](mdc:ovoenergy/models/) - Data models and schemas
+- **Exceptions**: [ovoenergy/exceptions.py](mdc:ovoenergy/exceptions.py) - Custom exceptions
+
+## Configuration Files
+
+- **Package config**: [pyproject.toml](mdc:pyproject.toml) - Ruff, Pylint, and pytest configuration
+- **Setup**: [setup.py](mdc:setup.py) - Package installation configuration
+- **Dependencies**: [requirements.txt](mdc:requirements.txt) - Runtime dependencies
+- **Test dependencies**: [requirements_test.txt](mdc:requirements_test.txt) - Testing dependencies
+
+## Testing
+
+- **Test directory**: [tests/](mdc:tests/) - All test files
+- **Test fixtures**: [tests/conftest.py](mdc:tests/conftest.py) - Pytest fixtures and mocks
+- **Main tests**: [tests/test**init**.py](mdc:tests/test__init__.py) - Core functionality tests
+
+## Key Classes and Modules
+
+- `OVOEnergy` - Main API client class in [ovoenergy/**init**.py](mdc:ovoenergy/__init__.py)
+- `Account`, `BootstrapAccounts` - Account management in [ovoenergy/models/accounts.py](mdc:ovoenergy/models/accounts.py)
+- `OVODailyUsage`, `OVOHalfHourUsage` - Usage data models
+- `OVOPlans` - Energy plan information
+- `OVOFootprint`, `OVOCarbonIntensity` - Carbon footprint and intensity data
+
+## API Endpoints
+
+The client interacts with OVO Energy's API endpoints:
+
+- Authentication: `https://my.ovoenergy.com/api/v2/auth/`
+- Usage data: `https://smartpaymapi.ovoenergy.com/usage/api/`
+- Plans: `https://smartpaymapi.ovoenergy.com/orex/api/plans/`
+- Carbon data: `https://smartpaymapi.ovoenergy.com/carbon-api/`
