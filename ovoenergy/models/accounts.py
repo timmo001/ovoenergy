@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 
@@ -19,7 +20,7 @@ class Supply:
     """Supply model."""
 
     mpxn: str | None
-    fuel: str | None
+    fuel: Literal["ELECTRICITY", "GAS"] | str | None
     is_onboarding: bool | None
     start: datetime | None
     is_payg: bool | None

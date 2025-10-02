@@ -8,11 +8,15 @@ from typing import Literal
 from uuid import UUID
 
 import aiohttp
+import jwt
 
+from .const import BOOTSTRAP_QUERY
 from .exceptions import (
+    OVOEnergyAPIInvalidResponse,
     OVOEnergyAPINoCookies,
     OVOEnergyAPINotAuthorized,
     OVOEnergyNoAccount,
+    OVOEnergyNoCustomer,
 )
 from .models import (
     OVOCost,
@@ -58,44 +62,34 @@ class OVOEnergy:
         """Initilalize."""
         self._client_session = client_session
 
+        self._customer_id: UUID | None = None
         self._bootstrap_accounts: BootstrapAccounts | None = None
         self._cookies: SimpleCookie | None = None
         self._oauth: OAuth | None = None
         self._username: str | None = None
+        self._account_id: int | None = None
+        self._fallback_account_ids: list[int] | None = None
 
     @property
     def account_id(self) -> int | None:
         """Return account id."""
-        if (
-            self.custom_account_id is not None
-            and self.account_ids is not None
-            and self.custom_account_id not in set(self.account_ids)
-        ):
-            raise OVOEnergyNoAccount("Custom account not found in accounts")
+        if self._account_id is None and self.custom_account_id is None:
+            raise OVOEnergyNoAccount("No account id set")
 
-        return (
-            self.custom_account_id
-            if self.custom_account_id is not None
-            else (
-                self._bootstrap_accounts.selected_account_id
-                if self._bootstrap_accounts
-                else None
-            )
-        )
+        return self.custom_account_id if self.custom_account_id else self._account_id
 
     @property
     def account_ids(self) -> list[int] | None:
         """Return account ids."""
-        return (
-            self._bootstrap_accounts.account_ids if self._bootstrap_accounts else None
-        )
+        return self._fallback_account_ids if self._fallback_account_ids else None
 
     @property
     def customer_id(self) -> UUID | None:
         """Return customer id."""
-        return (
-            self._bootstrap_accounts.customer_id if self._bootstrap_accounts else None
-        )
+        if self._customer_id is None:
+            raise OVOEnergyNoCustomer("No customer id set")
+
+        return self._customer_id
 
     @property
     def oauth(self) -> OAuth | None:
@@ -140,11 +134,9 @@ class OVOEnergy:
             cookies=self._cookies if with_cookies else None,
             headers=(
                 {
-                    "Authorization": (
-                        f"Bearer {self.oauth.access_token}" if self.oauth else None
-                    )
+                    "Authorization": f"Bearer {self.oauth.access_token}",
                 }
-                if with_authorization
+                if with_authorization and self.oauth
                 else None
             ),
             **kwargs,
@@ -210,68 +202,182 @@ class OVOEnergy:
             expires_at=datetime.now() + timedelta(minutes=json_response["expiresIn"]),
         )
 
+        # Read JWT token
+        decoded_token = jwt.decode(
+            self._oauth.access_token, options={"verify_signature": False}
+        )
+
+        # Set customer id from sub claim
+        self._customer_id = decoded_token.get("sub")
+
+        # Set fallback account ids from permissions array if it is set
+        ids: list[int] = []
+        for permission in decoded_token.get("permissions", []):
+            if "account::" not in permission:
+                continue
+            account_id = permission.split("account::")[1]
+            if not account_id.isdigit():
+                continue
+            ids.append(int(account_id))
+
+        # Set fallback account ids if they are set
+        if len(ids) > 0:
+            self._fallback_account_ids = ids
+        else:
+            self._fallback_account_ids = None
+
         return self._oauth
 
     async def bootstrap_accounts(self) -> BootstrapAccounts:
         """Bootstrap accounts."""
         response = await self._request(
-            "https://smartpaymapi.ovoenergy.com/first-login/api/bootstrap/v2/",
-            "GET",
+            "https://api.eu1.prod.kaluza.com/graphql/1",
+            "POST",
+            json={
+                "operationName": "Bootstrap",
+                "query": BOOTSTRAP_QUERY,
+                "variables": {
+                    "customerId": self.customer_id,
+                },
+            },
         )
         json_response = await response.json()
 
-        self._bootstrap_accounts = BootstrapAccounts(
-            account_ids=json_response["accountIds"],
-            customer_id=UUID(json_response["customerId"]),
-            selected_account_id=json_response["selectedAccountId"],
-            is_first_login=json_response.get("isFirstLogin", None),
-            accounts=(
-                [
-                    Account(
-                        account_id=account.get("accountId", None),
-                        is_payg=account.get("isPayg", None),
-                        is_blocked=account.get("isBlocked", None),
-                        supplies=(
-                            [
-                                Supply(
-                                    mpxn=supply["mpxn"],
-                                    fuel=supply["fuel"],
-                                    is_onboarding=supply["isOnboarding"],
-                                    start=(
-                                        datetime.fromisoformat(supply["start"])
-                                        if supply["start"]
-                                        else None
-                                    ),
-                                    is_payg=supply["isPayg"],
-                                    supply_point_info=(
-                                        SupplyPointInfo(
-                                            meter_type=supply["supplyPointInfo"][
-                                                "meterType"
-                                            ],
-                                            meter_not_found=supply["supplyPointInfo"][
-                                                "meterNotFound"
-                                            ],
-                                            address=supply["supplyPointInfo"][
-                                                "address"
-                                            ],
-                                        )
-                                        if supply["supplyPointInfo"]
-                                        else None
-                                    ),
-                                )
-                                for supply in account["supplies"]
-                            ]
-                            if "supplies" in account
-                            else None
-                            if "supplies" in account
-                            else None
+        if "data" not in json_response:
+            raise OVOEnergyAPIInvalidResponse("Missing 'data' key in response")
+        if "customer_nextV1" not in json_response["data"]:
+            raise OVOEnergyAPIInvalidResponse(
+                "Missing 'data.customer_nextV1' key in response"
+            )
+        if "id" not in json_response["data"]["customer_nextV1"]:
+            raise OVOEnergyAPIInvalidResponse(
+                "Missing 'data.customer_nextV1.id' key in response"
+            )
+        if (
+            "customerAccountRelationships"
+            not in json_response["data"]["customer_nextV1"]
+        ):
+            raise OVOEnergyAPIInvalidResponse(
+                "Missing 'data.customer_nextV1.customerAccountRelationships' key in response"
+            )
+        if (
+            "edges"
+            not in json_response["data"]["customer_nextV1"][
+                "customerAccountRelationships"
+            ]
+        ):
+            raise OVOEnergyAPIInvalidResponse(
+                "Missing 'data.customer_nextV1.customerAccountRelationships.edges' key in response"
+            )
+
+        accounts: list[Account] = []
+        for edge in json_response["data"]["customer_nextV1"][
+            "customerAccountRelationships"
+        ]["edges"]:
+            if "node" not in edge:
+                _LOGGER.warning(
+                    "Missing 'data.customer_nextV1.customerAccountRelationships.edges[X].node' key in response"
+                )
+                continue
+            if "account" not in edge["node"]:
+                _LOGGER.warning(
+                    "Missing 'data.customer_nextV1.customerAccountRelationships.edges[X].node.account' key in response"
+                )
+                continue
+
+            if "id" not in edge["node"]["account"]:
+                _LOGGER.warning(
+                    "Missing 'data.customer_nextV1.customerAccountRelationships.edges[X].node.account.id' key in response"
+                )
+                continue
+
+            if "accountSupplyPoints" not in edge["node"]["account"]:
+                _LOGGER.warning(
+                    "Missing 'data.customer_nextV1.customerAccountRelationships.edges[X].node.account.accountSupplyPoints' key in response"
+                )
+                continue
+
+            supplies: list[Supply] = []
+            for supply in edge["node"]["account"]["accountSupplyPoints"]:
+                if "supplyPoint" not in supply:
+                    _LOGGER.warning(
+                        "Missing 'data.customer_nextV1.customerAccountRelationships.edges[X].node.account.accountSupplyPoints[X].supplyPoint' key in response"
+                    )
+                    continue
+
+                if "meterTechnicalDetails" not in supply["supplyPoint"]:
+                    _LOGGER.warning(
+                        "Missing 'data.customer_nextV1.customerAccountRelationships.edges[X].node.account.accountSupplyPoints[X].supplyPoint.meterTechnicalDetails' key in response"
+                    )
+                    continue
+
+                active_meter_technical_details = None
+                for meter_detail in supply["supplyPoint"]["meterTechnicalDetails"]:
+                    if "status" not in meter_detail:
+                        _LOGGER.warning(
+                            "Missing 'data.customer_nextV1.customerAccountRelationships.edges[X].node.account.accountSupplyPoints[X].supplyPoint.meterTechnicalDetails[X].status' key in response"
+                        )
+                        continue
+
+                    if meter_detail["status"].lower() == "active":
+                        active_meter_technical_details = meter_detail
+                        break
+
+                supply_point_address_lines: list[str] = []
+                if "address" not in supply["supplyPoint"]:
+                    _LOGGER.warning(
+                        "Missing 'data.customer_nextV1.customerAccountRelationships.edges[X].node.account.accountSupplyPoints[X].supplyPoint.address' key in response. Allowing empty address."
+                    )
+                else:
+                    supply_point_address_lines = supply["supplyPoint"]["address"].get(
+                        "addressLines", []
+                    )
+                    if "postCode" in supply["supplyPoint"]["address"]:
+                        supply_point_address_lines.append(
+                            supply["supplyPoint"]["address"].get("postCode")
+                        )
+
+                supplies.append(
+                    Supply(
+                        mpxn=active_meter_technical_details["meterSerialNumber"]
+                        if active_meter_technical_details
+                        else None,
+                        fuel=supply["supplyPoint"].get("fuelType", None),
+                        is_onboarding=supply["supplyPoint"].get("isOnboarding", None),
+                        start=supply["supplyPoint"].get("startDate", None),
+                        is_payg=supply["supplyPoint"].get("isPayg", None),
+                        supply_point_info=SupplyPointInfo(
+                            meter_type=active_meter_technical_details["type"]
+                            if active_meter_technical_details
+                            else None,
+                            meter_not_found=active_meter_technical_details[
+                                "status"
+                            ].lower()
+                            == "removed"
+                            if active_meter_technical_details
+                            else None,
+                            address=supply_point_address_lines,
                         ),
                     )
-                    for account in json_response["accounts"]
-                ]
-                if "accounts" in json_response
-                else None
-            ),
+                )
+
+            accounts.append(
+                Account(
+                    account_id=edge["node"]["account"]["id"],
+                    is_payg=None,  # No longer supplied
+                    is_blocked=None,  # No longer supplied
+                    supplies=supplies,
+                )
+            )
+
+        self._bootstrap_accounts = BootstrapAccounts(
+            account_ids=[account.account_id for account in accounts],
+            customer_id=json_response["data"]["customer_nextV1"]["id"],
+            selected_account_id=accounts[
+                0
+            ].account_id,  # We no longer get this, so pick the first one, the user should specify otherwise
+            is_first_login=False,  # We no longer get this, so assume false
+            accounts=accounts,
         )
 
         return self._bootstrap_accounts
@@ -281,9 +387,6 @@ class OVOEnergy:
         date: str,
     ) -> OVODailyUsage:
         """Get daily usage data."""
-        if self.account_id is None:
-            raise OVOEnergyNoAccount("No account found")
-
         ovo_usage = OVODailyUsage(
             electricity=None,
             gas=None,
@@ -389,9 +492,6 @@ class OVOEnergy:
         date: str,
     ) -> OVOHalfHourUsage:
         """Get half hourly usage data."""
-        if self.account_id is None:
-            raise OVOEnergyNoAccount("No account found")
-
         ovo_usage = OVOHalfHourUsage(
             electricity=None,
             gas=None,
@@ -448,9 +548,6 @@ class OVOEnergy:
 
     async def get_plans(self) -> OVOPlans:
         """Get plans."""
-        if self.account_id is None:
-            raise OVOEnergyNoAccount("No account found")
-
         response = await self._request(
             f"https://smartpaymapi.ovoenergy.com/orex/api/plans/{self.account_id}",
             "GET",
@@ -544,9 +641,6 @@ class OVOEnergy:
 
     async def get_footprint(self) -> OVOFootprint:
         """Get footprint."""
-        if self.account_id is None:
-            raise OVOEnergyNoAccount("No account found")
-
         response = await self._request(
             f"https://smartpaymapi.ovoenergy.com/carbon-api/{self.account_id}/footprint",
             "GET",

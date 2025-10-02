@@ -3,11 +3,47 @@
 import asyncio
 from dataclasses import asdict
 from datetime import datetime, timedelta
+import os
+from pathlib import Path
 
 import aiohttp
 import typer
 
 from . import OVOEnergy
+
+
+def _load_env_file(env_path: str = ".env") -> None:
+    """Load environment variables from .env file."""
+    env_file = Path(env_path)
+    if not env_file.exists():
+        return
+
+    with open(env_file, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            # Skip empty lines and comments
+            if not line or line.startswith("#"):
+                continue
+
+            # Split on first = sign
+            if "=" in line:
+                key, value = line.split("=", 1)
+                key = key.strip()
+                value = value.strip()
+
+                # Remove quotes if present
+                if value.startswith('"') and value.endswith('"'):
+                    value = value[1:-1]
+                elif value.startswith("'") and value.endswith("'"):
+                    value = value[1:-1]
+
+                # Only set if not already in environment
+                if key not in os.environ:
+                    os.environ[key] = value
+
+
+# Load environment variables from .env file
+_load_env_file()
 
 app = typer.Typer()
 loop = asyncio.new_event_loop()
@@ -15,11 +51,20 @@ asyncio.set_event_loop(loop)
 
 
 async def _setup_client(
-    username: str,
-    password: str,
     account: int | None = None,
 ) -> tuple[OVOEnergy, aiohttp.ClientSession]:
     """Set up OVO Energy client."""
+    # Get credentials from environment variables
+    username = os.getenv("OVO_USERNAME")
+    password = os.getenv("OVO_PASSWORD")
+
+    if not username or not password:
+        typer.secho(
+            "Error: OVO_USERNAME and OVO_PASSWORD must be set in .env file",
+            fg=typer.colors.RED,
+        )
+        raise typer.Abort()
+
     client_session = aiohttp.ClientSession()
     client = OVOEnergy(
         client_session=client_session,
@@ -37,30 +82,8 @@ async def _setup_client(
     return (client, client_session)
 
 
-@app.command(name="bootstrap", short_help="Bootstrap OVO Energy")
-def bootstrap(
-    username: str = typer.Option(..., help="OVO Energy username"),
-    password: str = typer.Option(..., help="OVO Energy password"),
-) -> None:
-    """Authenticate with OVO Energy."""
-    [client, client_session] = loop.run_until_complete(
-        _setup_client(username, password)
-    )
-
-    bootstrap_accounts = loop.run_until_complete(client.bootstrap_accounts())
-
-    typer.secho(
-        asdict(bootstrap_accounts),
-        fg=typer.colors.GREEN,
-    )
-
-    loop.run_until_complete(client_session.close())
-
-
 @app.command(name="daily", short_help="Get daily usage from OVO Energy")
 def daily(
-    username: str = typer.Option(..., help="OVO Energy username"),
-    password: str = typer.Option(..., help="OVO Energy password"),
     account: int = typer.Option(
         None, help="OVO Energy account number (default: first account)"
     ),
@@ -73,9 +96,7 @@ def daily(
         # Get this month
         date = datetime.now().strftime("%Y-%m")
 
-    [client, client_session] = loop.run_until_complete(
-        _setup_client(username, password, account)
-    )
+    [client, client_session] = loop.run_until_complete(_setup_client(account))
     ovo_usage = loop.run_until_complete(client.get_daily_usage(date))
 
     typer.secho(
@@ -87,8 +108,6 @@ def daily(
 
 @app.command(name="halfhourly", short_help="Get half hourly usage from OVO Energy")
 def half_hourly(
-    username: str = typer.Option(..., help="OVO Energy username"),
-    password: str = typer.Option(..., help="OVO Energy password"),
     account: int = typer.Option(
         None, help="OVO Energy account number (default: first account)"
     ),
@@ -101,9 +120,7 @@ def half_hourly(
         # Get yesterday's date
         date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
-    [client, client_session] = loop.run_until_complete(
-        _setup_client(username, password, account)
-    )
+    [client, client_session] = loop.run_until_complete(_setup_client(account))
     ovo_usage = loop.run_until_complete(client.get_half_hourly_usage(date))
 
     typer.secho(
@@ -115,16 +132,12 @@ def half_hourly(
 
 @app.command(name="plans", short_help="Get plans from OVO Energy")
 def plans(
-    username: str = typer.Option(..., help="OVO Energy username"),
-    password: str = typer.Option(..., help="OVO Energy password"),
     account: int = typer.Option(
         None, help="OVO Energy account number (default: first account)"
     ),
 ) -> None:
     """Get rates from OVO Energy."""
-    [client, client_session] = loop.run_until_complete(
-        _setup_client(username, password, account)
-    )
+    [client, client_session] = loop.run_until_complete(_setup_client(account))
 
     ovo_plans = loop.run_until_complete(client.get_plans())
 
@@ -137,16 +150,12 @@ def plans(
 
 @app.command(name="carbon-footprint", short_help="Get carbon footprint from OVO Energy")
 def carbon_footprint(
-    username: str = typer.Option(..., help="OVO Energy username"),
-    password: str = typer.Option(..., help="OVO Energy password"),
     account: int = typer.Option(
         None, help="OVO Energy account number (default: first account)"
     ),
 ) -> None:
     """Get carbon footprint from OVO Energy."""
-    [client, client_session] = loop.run_until_complete(
-        _setup_client(username, password, account)
-    )
+    [client, client_session] = loop.run_until_complete(_setup_client(account))
     ovo_footprint = loop.run_until_complete(client.get_footprint())
 
     typer.secho(
@@ -162,16 +171,12 @@ def carbon_footprint(
 
 @app.command(name="carbon-intensity", short_help="Get carbon intensity from OVO Energy")
 def carbon_intensity(
-    username: str = typer.Option(..., help="OVO Energy username"),
-    password: str = typer.Option(..., help="OVO Energy password"),
     account: int = typer.Option(
         None, help="OVO Energy account number (default: first account)"
     ),
 ) -> None:
     """Get carbon intensity from OVO Energy."""
-    [client, client_session] = loop.run_until_complete(
-        _setup_client(username, password, account)
-    )
+    [client, client_session] = loop.run_until_complete(_setup_client(account))
     ovo_carbon_intensity = loop.run_until_complete(client.get_carbon_intensity())
 
     typer.secho(
