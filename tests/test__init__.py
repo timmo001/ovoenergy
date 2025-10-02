@@ -7,6 +7,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 
 from ovoenergy import OVOEnergy
+from ovoenergy.const import AUTH_LOGIN_URL, AUTH_TOKEN_URL, USAGE_DAILY_URL
 from ovoenergy.exceptions import (
     OVOEnergyAPINoCookies,
     OVOEnergyAPINotAuthorized,
@@ -101,25 +102,6 @@ async def test_get_half_hourly_usage(
 
     assert await ovoenergy_client.get_half_hourly_usage("2024-01-01") == snapshot(
         name="half_hourly_usage",
-    )
-
-
-@pytest.mark.asyncio
-async def test_get_plans(
-    ovoenergy_client: OVOEnergy,
-    mock_aioresponse: aioresponses,
-    snapshot: SnapshotAssertion,
-) -> None:
-    """Test get plans."""
-    with pytest.raises(OVOEnergyNoAccount):
-        await ovoenergy_client.get_plans()
-
-    await ovoenergy_client.authenticate(USERNAME, PASSWORD)
-
-    await ovoenergy_client.bootstrap_accounts()
-
-    assert await ovoenergy_client.get_plans() == snapshot(
-        name="plans",
     )
 
 
@@ -247,7 +229,7 @@ async def test_oauth_expired(
 
     mock_aioresponse.clear()
     mock_aioresponse.get(
-        "https://my.ovoenergy.com/api/v2/auth/token",
+        AUTH_TOKEN_URL,
         status=403,
         repeat=True,
     )
@@ -268,7 +250,7 @@ async def test_forbidden(
 
     mock_aioresponse.clear()
     mock_aioresponse.get(
-        f"https://smartpaymapi.ovoenergy.com/usage/api/daily/{ACCOUNT}?date=2024-01",
+        f"{USAGE_DAILY_URL}/{ACCOUNT}?date=2024-01",
         status=403,
         repeat=True,
     )
@@ -285,7 +267,7 @@ async def test_auth_not_found(
     """Test auth endpoint not found."""
     mock_aioresponse.clear()
     mock_aioresponse.post(
-        "https://my.ovoenergy.com/api/v2/auth/login",
+        AUTH_LOGIN_URL,
         status=404,
         repeat=True,
     )
@@ -301,7 +283,7 @@ async def test_auth_code_not_found(
     """Test auth endpoint code not found."""
     mock_aioresponse.clear()
     mock_aioresponse.post(
-        "https://my.ovoenergy.com/api/v2/auth/login",
+        AUTH_LOGIN_URL,
         status=204,
         repeat=True,
     )
@@ -317,7 +299,7 @@ async def test_auth_code_unknown(
     """Test auth token not found."""
     mock_aioresponse.clear()
     mock_aioresponse.post(
-        "https://my.ovoenergy.com/api/v2/auth/login",
+        AUTH_LOGIN_URL,
         status=200,
         payload={"code": "Unknown"},
         repeat=True,
@@ -334,13 +316,13 @@ async def test_auth_token_not_found(
     """Test auth token not found."""
     mock_aioresponse.clear()
     mock_aioresponse.post(
-        "https://my.ovoenergy.com/api/v2/auth/login",
+        AUTH_LOGIN_URL,
         payload=RESPONSE_JSON_AUTH,
         status=200,
         repeat=True,
     )
     mock_aioresponse.get(
-        "https://my.ovoenergy.com/api/v2/auth/token",
+        AUTH_TOKEN_URL,
         status=404,
         repeat=True,
     )

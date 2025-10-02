@@ -7,6 +7,15 @@ from aioresponses import aioresponses
 import pytest
 
 from ovoenergy import OVOEnergy
+from ovoenergy.const import (
+    AUTH_LOGIN_URL,
+    AUTH_TOKEN_URL,
+    BOOTSTRAP_GRAPHQL_URL,
+    CARBON_FOOTPRINT_URL,
+    CARBON_INTENSITY_URL,
+    USAGE_DAILY_URL,
+    USAGE_HALF_HOURLY_URL,
+)
 
 from . import (
     ACCOUNT,
@@ -15,7 +24,6 @@ from . import (
     RESPONSE_JSON_DAILY_USAGE,
     RESPONSE_JSON_FOOTPRINT,
     RESPONSE_JSON_INTENSITY,
-    RESPONSE_JSON_PLANS,
     RESPONSE_JSON_TOKEN,
 )
 
@@ -25,49 +33,43 @@ def mock_aioresponse():
     """Return a client session."""
     with aioresponses() as mocker:
         mocker.post(
-            "https://my.ovoenergy.com/api/v2/auth/login",
+            AUTH_LOGIN_URL,
             payload=RESPONSE_JSON_AUTH,
             status=200,
             repeat=True,
         )
         mocker.get(
-            "https://my.ovoenergy.com/api/v2/auth/token",
+            AUTH_TOKEN_URL,
             payload=RESPONSE_JSON_TOKEN,
             status=200,
             repeat=True,
         )
         mocker.get(
-            "https://smartpaymapi.ovoenergy.com/first-login/api/bootstrap/v2/",
+            BOOTSTRAP_GRAPHQL_URL,
             payload=RESPONSE_JSON_BOOTSTRAP_ACCOUNTS,
             status=200,
             repeat=True,
         )
         mocker.get(
-            f"https://smartpaymapi.ovoenergy.com/usage/api/daily/{ACCOUNT}?date=2024-01",
+            f"{USAGE_DAILY_URL}/{ACCOUNT}?date=2024-01",
             payload=RESPONSE_JSON_DAILY_USAGE,
             status=200,
             repeat=True,
         )
         mocker.get(
-            f"https://smartpaymapi.ovoenergy.com/usage/api/half-hourly/{ACCOUNT}?date=2024-01-01",
+            f"{USAGE_HALF_HOURLY_URL}/{ACCOUNT}?date=2024-01-01",
             payload=RESPONSE_JSON_DAILY_USAGE,
             status=200,
             repeat=True,
         )
         mocker.get(
-            f"https://smartpaymapi.ovoenergy.com/orex/api/plans/{ACCOUNT}",
-            payload=RESPONSE_JSON_PLANS,
-            status=200,
-            repeat=True,
-        )
-        mocker.get(
-            f"https://smartpaymapi.ovoenergy.com/carbon-api/{ACCOUNT}/footprint",
+            f"{CARBON_FOOTPRINT_URL}/{ACCOUNT}/footprint",
             payload=RESPONSE_JSON_FOOTPRINT,
             status=200,
             repeat=True,
         )
         mocker.get(
-            "https://smartpaymapi.ovoenergy.com/carbon-bff/carbonintensity",
+            CARBON_INTENSITY_URL,
             payload=RESPONSE_JSON_INTENSITY,
             status=200,
             repeat=True,

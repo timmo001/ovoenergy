@@ -85,11 +85,6 @@ RESPONSE_JSON_DAILY_USAGE: Final[dict] = {
     ],
 }
 
-RESPONSE_JSON_PLANS: Final[dict] = {
-    "electricity": [],
-    "gas": [],
-}
-
 RESPONSE_JSON_FOOTPRINT: Final[dict] = {
     "from": "2024-01-01T00:00:00Z",
     "to": "2024-01-01T23:59:59.999000Z",
