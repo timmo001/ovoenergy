@@ -2,6 +2,8 @@
 
 [![PyPI](https://img.shields.io/pypi/v/ovoenergy)](https://pypi.org/project/ovoenergy/)
 
+Get energy data from the OVO Energy APIs.
+
 > [!NOTE]
 > This package is not affiliated with OVO Energy.
 
@@ -12,5 +14,3 @@
 > This has only been tested with a UK account.
 > Some endpoints are pointing to EU servers.
 > If you are outside the UK, this package may not work.
-
-Get energy data from the OVO Energy APIs.
