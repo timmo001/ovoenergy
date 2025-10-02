@@ -67,21 +67,28 @@ class OVOEnergy:
         self._cookies: SimpleCookie | None = None
         self._oauth: OAuth | None = None
         self._username: str | None = None
-        self._account_id: int | None = None
-        self._fallback_account_ids: list[int] | None = None
+        self._account_ids: list[int] | None = None
 
     @property
     def account_id(self) -> int | None:
         """Return account id."""
-        if self._account_id is None and self.custom_account_id is None:
+        if self.custom_account_id is None and (
+            self.account_ids is None or len(self.account_ids) == 0
+        ):
             raise OVOEnergyNoAccount("No account id set")
 
-        return self.custom_account_id if self.custom_account_id else self._account_id
+        return (
+            self.custom_account_id
+            if self.custom_account_id
+            else self.account_ids[0]
+            if self.account_ids and len(self.account_ids) > 0
+            else None
+        )
 
     @property
     def account_ids(self) -> list[int] | None:
         """Return account ids."""
-        return self._fallback_account_ids if self._fallback_account_ids else None
+        return self._account_ids
 
     @property
     def customer_id(self) -> UUID | None:
@@ -222,9 +229,9 @@ class OVOEnergy:
 
         # Set fallback account ids if they are set
         if len(ids) > 0:
-            self._fallback_account_ids = ids
+            self._account_ids = ids
         else:
-            self._fallback_account_ids = None
+            self._account_ids = None
 
         return self._oauth
 
