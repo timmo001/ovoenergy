@@ -4,9 +4,6 @@
 
 Get energy data from the OVO Energy APIs.
 
-> [!NOTE]
-> This package is not affiliated with OVO Energy.
-
 > [!IMPORTANT]
 > This package is not officially supported by OVO Energy and is provided as-is.
 > If OVO change their APIs, this package may break.
