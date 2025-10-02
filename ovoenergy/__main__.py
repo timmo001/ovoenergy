@@ -130,24 +130,6 @@ def half_hourly(
     loop.run_until_complete(client_session.close())
 
 
-@app.command(name="plans", short_help="Get plans from OVO Energy")
-def plans(
-    account: int = typer.Option(
-        None, help="OVO Energy account number (default: first account)"
-    ),
-) -> None:
-    """Get rates from OVO Energy."""
-    [client, client_session] = loop.run_until_complete(_setup_client(account))
-
-    ovo_plans = loop.run_until_complete(client.get_plans())
-
-    typer.secho(
-        asdict(ovo_plans) if ovo_plans is not None else '{"message": "No data"}',
-        fg=typer.colors.GREEN,
-    )
-    loop.run_until_complete(client_session.close())
-
-
 @app.command(name="carbon-footprint", short_help="Get carbon footprint from OVO Energy")
 def carbon_footprint(
     account: int = typer.Option(
