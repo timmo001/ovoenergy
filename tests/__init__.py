@@ -11,6 +11,24 @@ RESPONSE_JSON_BASIC: Final[dict] = {"test": "test"}
 
 RESPONSE_JSON_AUTH: Final[dict] = {"code": "test"}
 
+# The token value is fake, don't panic.
+#
+# Decoded token:
+#
+# {
+#   "alg": "HS256",
+#   "typ": "JWT"
+# }
+#
+# {
+#   "sub": "5cafe9c4-a942-46b5-a67c-5882eba0a03c",
+#   "permissions": [
+#     "account::123456789"
+#   ],
+#   "iat": 1640995200,
+#   "exp": 1640998800
+# }
+#
 RESPONSE_JSON_TOKEN: Final[dict] = {
     "accessToken": {
         "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1Y2FmZTljNC1hOTQyLTQ2YjUtYTY3Yy01ODgyZWJhMGEwM2MiLCJwZXJtaXNzaW9ucyI6WyJhY2NvdW50OjoxMjM0NTY3ODkiXSwiaWF0IjoxNjQwOTk1MjAwLCJleHAiOjE2NDA5OTg4MDB9.ZXZcYyG6vT0NMdKlUy9KDnCj4DJyC7o3rX_AmPef6hw"
