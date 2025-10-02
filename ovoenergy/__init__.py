@@ -76,9 +76,11 @@ class OVOEnergy:
         return (
             self.custom_account_id
             if self.custom_account_id is not None
-            else self._bootstrap_accounts.selected_account_id
-            if self._bootstrap_accounts
-            else None
+            else (
+                self._bootstrap_accounts.selected_account_id
+                if self._bootstrap_accounts
+                else None
+            )
         )
 
     @property
@@ -136,13 +138,15 @@ class OVOEnergy:
             method,
             url,
             cookies=self._cookies if with_cookies else None,
-            headers={
-                "Authorization": f"Bearer {self.oauth.access_token}"
-                if self.oauth
+            headers=(
+                {
+                    "Authorization": (
+                        f"Bearer {self.oauth.access_token}" if self.oauth else None
+                    )
+                }
+                if with_authorization
                 else None
-            }
-            if with_authorization
-            else None,
+            ),
             **kwargs,
         )
         with contextlib.suppress(aiohttp.ClientResponseError):
@@ -221,41 +225,53 @@ class OVOEnergy:
             customer_id=UUID(json_response["customerId"]),
             selected_account_id=json_response["selectedAccountId"],
             is_first_login=json_response.get("isFirstLogin", None),
-            accounts=[
-                Account(
-                    account_id=account.get("accountId", None),
-                    is_payg=account.get("isPayg", None),
-                    is_blocked=account.get("isBlocked", None),
-                    supplies=[
-                        Supply(
-                            mpxn=supply["mpxn"],
-                            fuel=supply["fuel"],
-                            is_onboarding=supply["isOnboarding"],
-                            start=datetime.fromisoformat(supply["start"])
-                            if supply["start"]
-                            else None,
-                            is_payg=supply["isPayg"],
-                            supply_point_info=SupplyPointInfo(
-                                meter_type=supply["supplyPointInfo"]["meterType"],
-                                meter_not_found=supply["supplyPointInfo"][
-                                    "meterNotFound"
-                                ],
-                                address=supply["supplyPointInfo"]["address"],
-                            )
-                            if supply["supplyPointInfo"]
-                            else None,
-                        )
-                        for supply in account["supplies"]
-                    ]
-                    if "supplies" in account
-                    else None
-                    if "supplies" in account
-                    else None,
-                )
-                for account in json_response["accounts"]
-            ]
-            if "accounts" in json_response
-            else None,
+            accounts=(
+                [
+                    Account(
+                        account_id=account.get("accountId", None),
+                        is_payg=account.get("isPayg", None),
+                        is_blocked=account.get("isBlocked", None),
+                        supplies=(
+                            [
+                                Supply(
+                                    mpxn=supply["mpxn"],
+                                    fuel=supply["fuel"],
+                                    is_onboarding=supply["isOnboarding"],
+                                    start=(
+                                        datetime.fromisoformat(supply["start"])
+                                        if supply["start"]
+                                        else None
+                                    ),
+                                    is_payg=supply["isPayg"],
+                                    supply_point_info=(
+                                        SupplyPointInfo(
+                                            meter_type=supply["supplyPointInfo"][
+                                                "meterType"
+                                            ],
+                                            meter_not_found=supply["supplyPointInfo"][
+                                                "meterNotFound"
+                                            ],
+                                            address=supply["supplyPointInfo"][
+                                                "address"
+                                            ],
+                                        )
+                                        if supply["supplyPointInfo"]
+                                        else None
+                                    ),
+                                )
+                                for supply in account["supplies"]
+                            ]
+                            if "supplies" in account
+                            else None
+                            if "supplies" in account
+                            else None
+                        ),
+                    )
+                    for account in json_response["accounts"]
+                ]
+                if "accounts" in json_response
+                else None
+            ),
         )
 
         return self._bootstrap_accounts
@@ -288,33 +304,39 @@ class OVOEnergy:
                         ovo_usage.electricity.append(
                             OVODailyElectricity(
                                 consumption=usage.get("consumption", None),
-                                interval=OVOInterval(
-                                    start=datetime.fromisoformat(
-                                        usage["interval"]["start"]
-                                    ),
-                                    end=datetime.fromisoformat(
-                                        usage["interval"]["end"]
-                                    ),
-                                )
-                                if "interval" in usage
-                                else None,
-                                meter_readings=OVOMeterReadings(
-                                    start=usage["meterReadings"]["start"],
-                                    end=usage["meterReadings"]["end"],
-                                )
-                                if "meterReadings" in usage
-                                else None,
+                                interval=(
+                                    OVOInterval(
+                                        start=datetime.fromisoformat(
+                                            usage["interval"]["start"]
+                                        ),
+                                        end=datetime.fromisoformat(
+                                            usage["interval"]["end"]
+                                        ),
+                                    )
+                                    if "interval" in usage
+                                    else None
+                                ),
+                                meter_readings=(
+                                    OVOMeterReadings(
+                                        start=usage["meterReadings"]["start"],
+                                        end=usage["meterReadings"]["end"],
+                                    )
+                                    if "meterReadings" in usage
+                                    else None
+                                ),
                                 has_half_hour_data=usage.get("hasHalfHourData", None),
-                                cost=OVOCost(
-                                    amount=usage["cost"]["amount"],
-                                    currency_unit=usage["cost"]["currencyUnit"],
-                                )
-                                if "cost" in usage
-                                else None,
+                                cost=(
+                                    OVOCost(
+                                        amount=usage["cost"]["amount"],
+                                        currency_unit=usage["cost"]["currencyUnit"],
+                                    )
+                                    if "cost" in usage
+                                    else None
+                                ),
                                 rates=OVORates(
                                     anytime=usage["rates"]["anytime"],
                                     standing=usage["rates"]["standing"],
-                                )
+                                ),
                             )
                         )
 
@@ -328,22 +350,26 @@ class OVOEnergy:
                             OVODailyGas(
                                 consumption=usage.get("consumption", None),
                                 volume=usage.get("volume", None),
-                                interval=OVOInterval(
-                                    start=datetime.fromisoformat(
-                                        usage["interval"]["start"]
-                                    ),
-                                    end=datetime.fromisoformat(
-                                        usage["interval"]["end"]
-                                    ),
-                                )
-                                if "interval" in usage
-                                else None,
-                                meter_readings=OVOMeterReadings(
-                                    start=usage["meterReadings"]["start"],
-                                    end=usage["meterReadings"]["end"],
-                                )
-                                if "meterReadings" in usage
-                                else None,
+                                interval=(
+                                    OVOInterval(
+                                        start=datetime.fromisoformat(
+                                            usage["interval"]["start"]
+                                        ),
+                                        end=datetime.fromisoformat(
+                                            usage["interval"]["end"]
+                                        ),
+                                    )
+                                    if "interval" in usage
+                                    else None
+                                ),
+                                meter_readings=(
+                                    OVOMeterReadings(
+                                        start=usage["meterReadings"]["start"],
+                                        end=usage["meterReadings"]["end"],
+                                    )
+                                    if "meterReadings" in usage
+                                    else None
+                                ),
                                 has_half_hour_data=usage.get("hasHalfHourData", None),
                                 cost=OVOCost(
                                     amount=usage["cost"]["amount"],
@@ -352,7 +378,7 @@ class OVOEnergy:
                                 rates=OVORates(
                                     anytime=usage["rates"]["anytime"],
                                     standing=usage["rates"]["standing"],
-                                )
+                                ),
                             )
                         )
 
@@ -474,42 +500,46 @@ class OVOEnergy:
                 )
                 for json_response in json_response["electricity"]
             ],
-            gas=[
-                OVOPlanGas(
-                    name=json_response["gas"]["name"],
-                    exit_fee=OVOPlanRate(
-                        amount=json_response["gas"]["exitFee"]["amount"],
-                        currency_unit=json_response["gas"]["exitFee"]["currencyUnit"],
-                    ),
-                    contract_start_date=json_response["gas"]["contractStartDate"],
-                    contract_end_date=json_response["gas"]["contractEndDate"],
-                    contract_type=json_response["gas"]["contractType"],
-                    is_in_renewal=json_response["gas"]["isInRenewal"],
-                    has_future_contracts=json_response["gas"]["hasFutureContracts"],
-                    mpxn=json_response["gas"]["mpxn"],
-                    msn=json_response["gas"]["msn"],
-                    personal_projection=json_response["gas"]["personalProjection"],
-                    standing_charge=OVOPlanRate(
-                        amount=json_response["gas"]["standingCharge"]["amount"],
-                        currency_unit=json_response["gas"]["standingCharge"][
-                            "currencyUnit"
+            gas=(
+                [
+                    OVOPlanGas(
+                        name=json_response["gas"]["name"],
+                        exit_fee=OVOPlanRate(
+                            amount=json_response["gas"]["exitFee"]["amount"],
+                            currency_unit=json_response["gas"]["exitFee"][
+                                "currencyUnit"
+                            ],
+                        ),
+                        contract_start_date=json_response["gas"]["contractStartDate"],
+                        contract_end_date=json_response["gas"]["contractEndDate"],
+                        contract_type=json_response["gas"]["contractType"],
+                        is_in_renewal=json_response["gas"]["isInRenewal"],
+                        has_future_contracts=json_response["gas"]["hasFutureContracts"],
+                        mpxn=json_response["gas"]["mpxn"],
+                        msn=json_response["gas"]["msn"],
+                        personal_projection=json_response["gas"]["personalProjection"],
+                        standing_charge=OVOPlanRate(
+                            amount=json_response["gas"]["standingCharge"]["amount"],
+                            currency_unit=json_response["gas"]["standingCharge"][
+                                "currencyUnit"
+                            ],
+                        ),
+                        unit_rates=[
+                            OVOPlanUnitRate(
+                                name=unit_rate["name"],
+                                unit_rate=OVOPlanRate(
+                                    amount=unit_rate["unitRate"]["amount"],
+                                    currency_unit=unit_rate["unitRate"]["currencyUnit"],
+                                ),
+                            )
+                            for unit_rate in json_response["gas"]["unitRates"]
                         ],
-                    ),
-                    unit_rates=[
-                        OVOPlanUnitRate(
-                            name=unit_rate["name"],
-                            unit_rate=OVOPlanRate(
-                                amount=unit_rate["unitRate"]["amount"],
-                                currency_unit=unit_rate["unitRate"]["currencyUnit"],
-                            ),
-                        )
-                        for unit_rate in json_response["gas"]["unitRates"]
-                    ],
-                )
-                for json_response in json_response["gas"]
-            ]
-            if "gas" in json_response
-            else None,
+                    )
+                    for json_response in json_response["gas"]
+                ]
+                if "gas" in json_response
+                else None
+            ),
         )
 
     async def get_footprint(self) -> OVOFootprint:

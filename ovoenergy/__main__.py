@@ -8,7 +8,6 @@ import aiohttp
 import typer
 
 from . import OVOEnergy
-from ._version import __version__
 
 app = typer.Typer()
 loop = asyncio.new_event_loop()
@@ -151,9 +150,11 @@ def carbon_footprint(
     ovo_footprint = loop.run_until_complete(client.get_footprint())
 
     typer.secho(
-        asdict(ovo_footprint)
-        if ovo_footprint is not None
-        else '{"message": "No data"}',
+        (
+            asdict(ovo_footprint)
+            if ovo_footprint is not None
+            else '{"message": "No data"}'
+        ),
         fg=typer.colors.GREEN,
     )
     loop.run_until_complete(client_session.close())
@@ -174,18 +175,14 @@ def carbon_intensity(
     ovo_carbon_intensity = loop.run_until_complete(client.get_carbon_intensity())
 
     typer.secho(
-        asdict(ovo_carbon_intensity)
-        if ovo_carbon_intensity is not None
-        else '{"message": "No data"}',
+        (
+            asdict(ovo_carbon_intensity)
+            if ovo_carbon_intensity is not None
+            else '{"message": "No data"}'
+        ),
         fg=typer.colors.GREEN,
     )
     loop.run_until_complete(client_session.close())
-
-
-@app.command(name="version", short_help="Module Version")
-def version() -> None:
-    """Display module version."""
-    typer.secho(__version__.public(), fg=typer.colors.CYAN)
 
 
 if __name__ == "__main__":

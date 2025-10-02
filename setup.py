@@ -2,10 +2,6 @@
 
 from setuptools import find_packages, setup
 
-# Get setup packages from requirements.txt
-with open("requirements_setup.txt", encoding="utf-8") as f:
-    requirements_setup = f.read().splitlines()
-
 # Get packages from requirements.txt
 with open("requirements.txt", encoding="utf-8") as f:
     requirements = f.read().splitlines()
@@ -26,6 +22,5 @@ setup(
     install_requires=requirements,
     packages=find_packages(exclude=["tests", "generator"]),
     python_requires=">=3.11",
-    setup_requires=requirements_setup,
-    use_incremental=True,
+    version="2.0.2.dev0",
 )
