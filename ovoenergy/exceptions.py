@@ -14,6 +14,9 @@ class OVOEnergyNoAccount(OVOEnergyException):
 class OVOEnergyAPIException(OVOEnergyException):
     """Exception for API exceptions."""
 
+class OVOEnergyAPIInvalidResponse(OVOEnergyAPIException):
+    """Exception for invalid response."""
+
 
 class OVOEnergyAPINotAuthorized(OVOEnergyAPIException):
     """Exception for API client not authorized."""
@@ -21,3 +24,7 @@ class OVOEnergyAPINotAuthorized(OVOEnergyAPIException):
 
 class OVOEnergyAPINoCookies(OVOEnergyAPIException):
     """Exception for no cookies found."""
+
+
+class OVOEnergyNoCustomer(OVOEnergyException):
+    """Exception for no customer found."""
