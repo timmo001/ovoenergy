@@ -1,4 +1,4 @@
-# OVOEnergy Python Client
+# OVO Energy Python Client
 
 [![PyPI](https://img.shields.io/pypi/v/ovoenergy)](https://pypi.org/project/ovoenergy/)
 
