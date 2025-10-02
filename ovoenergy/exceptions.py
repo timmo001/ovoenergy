@@ -23,6 +23,10 @@ class OVOEnergyAPINotAuthorized(OVOEnergyAPIException):
     """Exception for API client not authorized."""
 
 
+class OVOEnergyAPINotFound(OVOEnergyAPIException):
+    """Exception for API endpoint not found (404)."""
+
+
 class OVOEnergyAPINoCookies(OVOEnergyAPIException):
     """Exception for no cookies found."""
 

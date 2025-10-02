@@ -24,6 +24,7 @@ from .exceptions import (
     OVOEnergyAPIInvalidResponse,
     OVOEnergyAPINoCookies,
     OVOEnergyAPINotAuthorized,
+    OVOEnergyAPINotFound,
     OVOEnergyNoAccount,
     OVOEnergyNoCustomer,
 )
@@ -155,6 +156,9 @@ class OVOEnergy:
 
         if with_authorization and response.status in [401, 403]:
             raise OVOEnergyAPINotAuthorized(f"Not authorized: {response.status}")
+
+        if response.status == 404:
+            raise OVOEnergyAPINotFound(f"Endpoint not found: {response.status}")
 
         return response
 
