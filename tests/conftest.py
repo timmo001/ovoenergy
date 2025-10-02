@@ -19,10 +19,12 @@ from ovoenergy.const import (
 
 from . import (
     ACCOUNT,
+    ACCOUNT_BAD,
     RESPONSE_JSON_AUTH,
     RESPONSE_JSON_BOOTSTRAP_ACCOUNTS,
     RESPONSE_JSON_DAILY_USAGE,
     RESPONSE_JSON_FOOTPRINT,
+    RESPONSE_JSON_HALF_HOURLY_USAGE,
     RESPONSE_JSON_INTENSITY,
     RESPONSE_JSON_TOKEN,
 )
@@ -44,7 +46,7 @@ def mock_aioresponse():
             status=200,
             repeat=True,
         )
-        mocker.get(
+        mocker.post(
             BOOTSTRAP_GRAPHQL_URL,
             payload=RESPONSE_JSON_BOOTSTRAP_ACCOUNTS,
             status=200,
@@ -58,7 +60,7 @@ def mock_aioresponse():
         )
         mocker.get(
             f"{USAGE_HALF_HOURLY_URL}/{ACCOUNT}?date=2024-01-01",
-            payload=RESPONSE_JSON_DAILY_USAGE,
+            payload=RESPONSE_JSON_HALF_HOURLY_USAGE,
             status=200,
             repeat=True,
         )
@@ -66,6 +68,11 @@ def mock_aioresponse():
             f"{CARBON_FOOTPRINT_URL}/{ACCOUNT}/footprint",
             payload=RESPONSE_JSON_FOOTPRINT,
             status=200,
+            repeat=True,
+        )
+        mocker.get(
+            f"{USAGE_DAILY_URL}/{ACCOUNT_BAD}?date=2024-01",
+            status=404,
             repeat=True,
         )
         mocker.get(

@@ -1,12 +1,17 @@
 # serializer version: 1
 # name: test_authorize[authorize_account_id]
-  None
+  123456789
+# ---
+# name: test_authorize[authorize_account_ids]
+  list([
+    123456789,
+  ])
 # ---
 # name: test_authorize[authorize_customer_id]
-  None
+  '5cafe9c4-a942-46b5-a67c-5882eba0a03c'
 # ---
 # name: test_authorize[authorize_oauth_access_token]
-  'test'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1Y2FmZTljNC1hOTQyLTQ2YjUtYTY3Yy01ODgyZWJhMGEwM2MiLCJwZXJtaXNzaW9ucyI6WyJhY2NvdW50OjoxMjM0NTY3ODkiXSwiaWF0IjoxNjQwOTk1MjAwLCJleHAiOjE2NDA5OTg4MDB9.ZXZcYyG6vT0NMdKlUy9KDnCj4DJyC7o3rX_AmPef6hw'
 # ---
 # name: test_authorize[authorize_oauth_expires_in]
   3600
@@ -18,23 +23,20 @@
   'test'
 # ---
 # name: test_bootstrap[bootstrap_accounts]
-  BootstrapAccounts(account_ids=[123456789], customer_id=UUID('5cafe9c4-a942-46b5-a67c-5882eba0a03c'), selected_account_id=123456789, accounts=[Account(account_id=123456789, is_payg=False, is_blocked=False, supplies=[Supply(mpxn='3456766576', fuel='gas', is_onboarding=False, start=datetime.datetime(2024, 1, 1, 23, 0, tzinfo=datetime.timezone.utc), is_payg=False, supply_point_info=SupplyPointInfo(meter_type='AB123', meter_not_found=False, address=['ADDR'])), Supply(mpxn='4536756746', fuel='electricity', is_onboarding=False, start=datetime.datetime(2024, 1, 1, 23, 0, tzinfo=datetime.timezone.utc), is_payg=False, supply_point_info=SupplyPointInfo(meter_type='AB123', meter_not_found=False, address=['ADDR']))])], is_first_login=False)
+  BootstrapAccounts(account_ids=[123456789], customer_id='5cafe9c4-a942-46b5-a67c-5882eba0a03c', selected_account_id=123456789, accounts=[Account(account_id=123456789, is_payg=None, is_blocked=None, supplies=[Supply(mpxn='3456766576', fuel='gas', is_onboarding=False, start=None, is_payg=False, supply_point_info=SupplyPointInfo(meter_type='AB123', meter_not_found=False, address=['ADDR', 'SW1A 1AA'])), Supply(mpxn='4536756746', fuel='electricity', is_onboarding=False, start=None, is_payg=False, supply_point_info=SupplyPointInfo(meter_type='AB123', meter_not_found=False, address=['ADDR', 'SW1A 1AA']))])], is_first_login=False)
 # ---
 # name: test_bootstrap_custom_account[bootstrap_accounts_custom_account]
-  OVODailyUsage(electricity=None, gas=None)
+  OVODailyUsage(electricity=[OVODailyElectricity(consumption=10.24, interval=OVOInterval(start=datetime.datetime(2024, 1, 1, 0, 0, tzinfo=datetime.timezone.utc), end=datetime.datetime(2024, 1, 1, 23, 59, 59, 999000, tzinfo=datetime.timezone.utc)), meter_readings=OVOMeterReadings(start='12345', end='67890'), has_half_hour_data=None, cost=OVOCost(amount='2.94', currency_unit='GBP'), rates=OVORates(anytime=0.25, standing=0.45))], gas=[OVODailyGas(consumption=14.68, volume=None, interval=OVOInterval(start=datetime.datetime(2024, 1, 1, 0, 0, tzinfo=datetime.timezone.utc), end=datetime.datetime(2024, 1, 1, 23, 59, 59, 999000, tzinfo=datetime.timezone.utc)), meter_readings=OVOMeterReadings(start='12345', end='67890'), has_half_hour_data=None, cost=OVOCost(amount='2.56', currency_unit='GBP'), rates=OVORates(anytime=0.18, standing=0.35))])
 # ---
 # name: test_get_carbon_intensity[carbon_intensity]
   OVOCarbonIntensity(forecast=[OVOCarbonIntensityForecast(time_from='2pm', intensity=82, level='low', colour='#0A9928', colour_v2='#0D8426')], current='low', greentime=None)
 # ---
 # name: test_get_daily_usage[daily_usage]
-  OVODailyUsage(electricity=None, gas=None)
+  OVODailyUsage(electricity=[OVODailyElectricity(consumption=10.24, interval=OVOInterval(start=datetime.datetime(2024, 1, 1, 0, 0, tzinfo=datetime.timezone.utc), end=datetime.datetime(2024, 1, 1, 23, 59, 59, 999000, tzinfo=datetime.timezone.utc)), meter_readings=OVOMeterReadings(start='12345', end='67890'), has_half_hour_data=None, cost=OVOCost(amount='2.94', currency_unit='GBP'), rates=OVORates(anytime=0.25, standing=0.45))], gas=[OVODailyGas(consumption=14.68, volume=None, interval=OVOInterval(start=datetime.datetime(2024, 1, 1, 0, 0, tzinfo=datetime.timezone.utc), end=datetime.datetime(2024, 1, 1, 23, 59, 59, 999000, tzinfo=datetime.timezone.utc)), meter_readings=OVOMeterReadings(start='12345', end='67890'), has_half_hour_data=None, cost=OVOCost(amount='2.56', currency_unit='GBP'), rates=OVORates(anytime=0.18, standing=0.35))])
 # ---
 # name: test_get_footprint[footprint]
   OVOFootprint(from_='2024-01-01T00:00:00Z', to='2024-01-01T23:59:59.999000Z', carbon_reduction_product_ids=[], carbon_footprint=OVOCarbonFootprint(carbon_kg=2200.1234, carbon_saved_kg=0.0, k_wh=1578.3246, breakdown=OVOFootprintBreakdown(electricity=OVOFootprintElectricity(carbon_kg=200.1234, carbon_saved_kg=230.02, k_wh=65645.92), gas=OVOFootprintGas(carbon_kg=2000.1234, carbon_saved_kg=340.02, k_wh=10664.74363579))))
 # ---
 # name: test_get_half_hourly_usage[half_hourly_usage]
-  OVOHalfHourUsage(electricity=None, gas=None)
-# ---
-# name: test_get_plans[plans]
-  OVOPlans(electricity=[], gas=[])
+  OVOHalfHourUsage(electricity=[OVOHalfHour(consumption=0.5, interval=OVOInterval(start=datetime.datetime(2024, 1, 1, 0, 0, tzinfo=datetime.timezone.utc), end=datetime.datetime(2024, 1, 1, 0, 30, tzinfo=datetime.timezone.utc)), unit='kWh')], gas=[OVOHalfHour(consumption=0.2, interval=OVOInterval(start=datetime.datetime(2024, 1, 1, 0, 0, tzinfo=datetime.timezone.utc), end=datetime.datetime(2024, 1, 1, 0, 30, tzinfo=datetime.timezone.utc)), unit='m³')])
 # ---

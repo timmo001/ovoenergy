@@ -11,6 +11,7 @@ from ovoenergy.const import AUTH_LOGIN_URL, AUTH_TOKEN_URL, USAGE_DAILY_URL
 from ovoenergy.exceptions import (
     OVOEnergyAPINoCookies,
     OVOEnergyAPINotAuthorized,
+    OVOEnergyAPINotFound,
     OVOEnergyNoAccount,
 )
 
@@ -43,7 +44,7 @@ async def test_authorize(
         name="authorize_account_id",
     )
     assert ovoenergy_client.account_ids == snapshot(
-        name="authorize_account_id",
+        name="authorize_account_ids",
     )
     assert ovoenergy_client.customer_id == snapshot(
         name="authorize_customer_id",
@@ -168,7 +169,7 @@ async def test_bad_account(
 
     ovoenergy_client.custom_account_id = ACCOUNT_BAD
 
-    with pytest.raises(OVOEnergyNoAccount):
+    with pytest.raises(OVOEnergyAPINotFound):
         await ovoenergy_client.get_daily_usage("2024-01")
 
 
@@ -272,7 +273,8 @@ async def test_auth_not_found(
         repeat=True,
     )
 
-    assert not await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+    with pytest.raises(OVOEnergyAPINotFound):
+        await ovoenergy_client.authenticate(USERNAME, PASSWORD)
 
 
 @pytest.mark.asyncio
@@ -327,4 +329,5 @@ async def test_auth_token_not_found(
         repeat=True,
     )
 
-    assert not await ovoenergy_client.authenticate(USERNAME, PASSWORD)
+    with pytest.raises(OVOEnergyAPINotFound):
+        await ovoenergy_client.authenticate(USERNAME, PASSWORD)
