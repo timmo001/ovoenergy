@@ -19,96 +19,72 @@ jobs:
       id-token: write
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v5
         with:
           ref: "master"
           token: ${{ secrets.PUSH_TOKEN }}
       - name: 🏗 Set up Python
-        uses: actions/setup-python@v5.2.0
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.12"
           architecture: "x64"
           cache: "pip"
-      - name: 🏗 Install setuptools, wheel, twine, click, twisted, incremental
+      - name: 🏗 Install build tooling
         run: |
-          python -m pip install --upgrade setuptools wheel twine click twisted incremental
+          python -m pip install --upgrade setuptools wheel twine
       - name: 🔢 Get old version
         id: get-version-old
         run: |
-          python -m pip install .
-
-          # Read version from _version.py
-          result=$(python <<EOF
-          from ${{ env.MODULE_NAME }}._version import __version__
-          print(__version__.public())
-          EOF
-          )
-
+          result=$(python script/get_version.py)
           echo "version=$result" >> $GITHUB_OUTPUT
-      - name: 🔢 Set correct vertion - Developement
+      - name: 🔢 Set correct version - Development
         if: ${{ github.event_name != 'release' }}
         run: |
-          # If version does not contain dev, add it
-          if [[ ! "${{ steps.get-version-old.outputs.version }}" == *"dev"* ]]; then
-            python -m incremental.update ${{ env.MODULE_NAME }} --dev
-          fi
-      - name: 🔢 Set correct vertion - Release
+          python script/set_dev_version.py
+      - name: 🔢 Set correct version - Release
         if: ${{ github.event_name == 'release' }}
         run: |
-          # If version contains dev*, remove it
-          if [[ "${{ steps.get-version-old.outputs.version }}" == *"dev"* ]]; then
-            NEW_VERSION=$(echo "${{ steps.get-version-old.outputs.version }}" | sed 's/.dev.*//')
-            python -m incremental.update ${{ env.MODULE_NAME }} --newversion $NEW_VERSION
-          fi
+          python script/set_release_version.py
       - name: 🔢 Get current version
         id: get-version-current
         run: |
-          result=$(python <<EOF
-          from ${{ env.MODULE_NAME }}._version import __version__
-          print(__version__.public())
-          EOF
-          )
+          result=$(python script/get_version.py)
           echo "version=$result" >> $GITHUB_OUTPUT
       - name: ⤵️ Pull latest changes from GitHub
         run: |
           git pull --ff
       - name: 🖊 Commit
-        uses: stefanzweifel/git-auto-commit-action@v5.0.1
+        uses: stefanzweifel/git-auto-commit-action@v6.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.PUSH_TOKEN }}
         with:
           commit_message: |
             Bump ${{ env.MODULE_NAME }} version to ${{ steps.get-version-current.outputs.version }}
-      - name: 🏗 Install package
+      - name: 🏗 Build distributions
         run: |
           python setup.py sdist bdist_wheel
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           verbose: true
-      - name: 🔢 Increment version - Developement
+      - name: 🔢 Increment version - Development
         if: ${{ github.event_name != 'release' }}
         run: |
-          python -m incremental.update ${{ env.MODULE_NAME }} --dev
+          python script/increment_version_dev.py
       - name: 🔢 Increment version - Release
         if: ${{ github.event_name == 'release' }}
         run: |
-          python -m incremental.update ${{ env.MODULE_NAME }} --patch
-          python -m incremental.update ${{ env.MODULE_NAME }} --dev
+          python script/increment_version_release.py
       - name: 🔢 Get new version
         id: get-version-new
         run: |
-          result=$(python <<EOF
-          from ${{ env.MODULE_NAME }}._version import __version__
-          print(__version__.public())
-          EOF
-          )
+          result=$(python script/get_version.py)
           echo "version=$result" >> $GITHUB_OUTPUT
       - name: ⤵️ Pull latest changes from GitHub
         run: |
           git pull --ff
       - name: 🖊 Commit
-        uses: stefanzweifel/git-auto-commit-action@v5.0.1
+        uses: stefanzweifel/git-auto-commit-action@v6.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.PUSH_TOKEN }}
         with:
