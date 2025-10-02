@@ -22,5 +22,5 @@ setup(
     install_requires=requirements,
     packages=find_packages(exclude=["tests", "generator"]),
     python_requires=">=3.11",
-    version="3.0.2",
+    version="3.0.3.dev0",
 )
