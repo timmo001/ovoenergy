@@ -10,7 +10,16 @@ from uuid import UUID
 import aiohttp
 import jwt
 
-from .const import BOOTSTRAP_QUERY
+from .const import (
+    AUTH_LOGIN_URL,
+    AUTH_TOKEN_URL,
+    BOOTSTRAP_GRAPHQL_URL,
+    BOOTSTRAP_QUERY,
+    CARBON_FOOTPRINT_URL,
+    CARBON_INTENSITY_URL,
+    USAGE_DAILY_URL,
+    USAGE_HALF_HOURLY_URL,
+)
 from .exceptions import (
     OVOEnergyAPIInvalidResponse,
     OVOEnergyAPINoCookies,
@@ -39,13 +48,6 @@ from .models.footprint import (
     OVOFootprintGas,
 )
 from .models.oauth import OAuth
-from .models.plan import (
-    OVOPlanElectricity,
-    OVOPlanGas,
-    OVOPlanRate,
-    OVOPlans,
-    OVOPlanUnitRate,
-)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -163,7 +165,7 @@ class OVOEnergy:
     ) -> bool:
         """Authenticate."""
         response = await self._request(
-            "https://my.ovoenergy.com/api/v2/auth/login",
+            AUTH_LOGIN_URL,
             "POST",
             json={
                 "username": username,
@@ -192,7 +194,7 @@ class OVOEnergy:
     async def get_token(self) -> OAuth | Literal[False]:
         """Get token."""
         response = await self._request(
-            "https://my.ovoenergy.com/api/v2/auth/token",
+            AUTH_TOKEN_URL,
             "GET",
             with_authorization=False,
         )
@@ -238,7 +240,7 @@ class OVOEnergy:
     async def bootstrap_accounts(self) -> BootstrapAccounts:
         """Bootstrap accounts."""
         response = await self._request(
-            "https://api.eu1.prod.kaluza.com/graphql/1",
+            BOOTSTRAP_GRAPHQL_URL,
             "POST",
             json={
                 "operationName": "Bootstrap",
@@ -400,7 +402,7 @@ class OVOEnergy:
         )
 
         response = await self._request(
-            f"https://smartpaymapi.ovoenergy.com/usage/api/daily/{self.account_id}?date={date}",
+            f"{USAGE_DAILY_URL}/{self.account_id}?date={date}",
             "GET",
         )
         json_response = await response.json()
@@ -505,7 +507,7 @@ class OVOEnergy:
         )
 
         response = await self._request(
-            f"https://smartpaymapi.ovoenergy.com/usage/api/half-hourly/{self.account_id}?date={date}",
+            f"{USAGE_HALF_HOURLY_URL}/{self.account_id}?date={date}",
             "GET",
         )
         json_response = await response.json()
@@ -556,7 +558,7 @@ class OVOEnergy:
     async def get_footprint(self) -> OVOFootprint:
         """Get footprint."""
         response = await self._request(
-            f"https://smartpaymapi.ovoenergy.com/carbon-api/{self.account_id}/footprint",
+            f"{CARBON_FOOTPRINT_URL}/{self.account_id}/footprint",
             "GET",
         )
         json_response = await response.json()
@@ -599,7 +601,7 @@ class OVOEnergy:
     async def get_carbon_intensity(self):
         """Get carbon intensity."""
         response = await self._request(
-            "https://smartpaymapi.ovoenergy.com/carbon-bff/carbonintensity",
+            CARBON_INTENSITY_URL,
             "GET",
         )
         json_response = await response.json()
