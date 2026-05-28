@@ -10,4 +10,4 @@ permissions:
 
 jobs:
   dependency-review:
-    uses: timmo001/workflows/.github/workflows/depedency-review.yml@master
+    uses: timmo001/workflows/.github/workflows/dependency-review.yml@master
