@@ -6,4 +6,4 @@ pytest-socket==0.7.0
 pytest-sugar==1.1.1
 pytest-timeout==2.4.0
 pytest==9.0.2
-syrupy==5.1.0
+syrupy==5.3.1
