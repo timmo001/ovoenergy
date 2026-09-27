@@ -19,4 +19,4 @@ concurrency:
 
 jobs:
   build:
-    uses: timmo001/workflows/.github/workflows/build-python-linux.yml@master
+    uses: timmo001/workflows/.github/workflows/build-python-linux.yml@0f94251168336b74fadf271a955d24d1de4de343 # 20260927.1

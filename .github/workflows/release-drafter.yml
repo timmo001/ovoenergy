@@ -14,4 +14,4 @@ permissions:
 
 jobs:
   release-drafter:
-    uses: timmo001/workflows/.github/workflows/release-drafter.yml@master
+    uses: timmo001/workflows/.github/workflows/release-drafter.yml@0f94251168336b74fadf271a955d24d1de4de343 # 20260927.1
