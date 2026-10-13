@@ -19,11 +19,11 @@ concurrency:
 
 jobs:
   lint-jsonlint:
-    uses: timmo001/workflows/.github/workflows/lint-jsonlint.yml@816cb358079216167ccd46c8b55bd1386a57116a # 20261013.0
+    uses: timmo001/workflows/.github/workflows/lint-jsonlint.yml@996dd60d03b12f28b482074a9eed7083a18e2439 # 20261013.1
   lint-markdown-links:
-    uses: timmo001/workflows/.github/workflows/lint-markdown-links.yml@816cb358079216167ccd46c8b55bd1386a57116a # 20261013.0
+    uses: timmo001/workflows/.github/workflows/lint-markdown-links.yml@996dd60d03b12f28b482074a9eed7083a18e2439 # 20261013.1
   lint-markdownlint:
-    uses: timmo001/workflows/.github/workflows/lint-markdownlint.yml@816cb358079216167ccd46c8b55bd1386a57116a # 20261013.0
+    uses: timmo001/workflows/.github/workflows/lint-markdownlint.yml@996dd60d03b12f28b482074a9eed7083a18e2439 # 20261013.1
   lint-pylint:
     name: Lint (pylint)
     runs-on: ubuntu-latest
@@ -44,4 +44,4 @@ jobs:
         run: |
           pylint --rcfile=pyproject.toml ovoenergy
   lint-ruff:
-    uses: timmo001/workflows/.github/workflows/lint-ruff.yml@816cb358079216167ccd46c8b55bd1386a57116a # 20261013.0
+    uses: timmo001/workflows/.github/workflows/lint-ruff.yml@996dd60d03b12f28b482074a9eed7083a18e2439 # 20261013.1
